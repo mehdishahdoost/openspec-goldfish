@@ -1,0 +1,214 @@
+{
+  "runId": "602fda52-1a58-43b8-872c-66fcfdb46bca",
+  "change": "sample",
+  "harness": "codex",
+  "harnessVersion": "0.167.0",
+  "packageVersion": "0.1.0",
+  "protocolVersion": 1,
+  "inputFingerprint": "4564612544e417b669369428548ba748a0347ea60bdc553ce6bcbbe433dea3c4",
+  "createdAt": "2026-11-08T22:24:36.280Z",
+  "completion": "complete",
+  "readiness": "revise",
+  "freshness": "current",
+  "coverageLimits": [],
+  "roleResults": {
+    "cold-reader": {
+      "role": "cold-reader",
+      "status": "complete",
+      "reconstruction": "An authenticated customer can synchronously create a JSON export of their own profile through the existing export API and receive a download link. The JSON contains customer ID and display name; access is restricted to the requesting customer, and the link expires and file is deleted after one hour. Creation uses GET /exports/create without a request ID. Timeouts receive two automatic retries spaced one second apart, followed by terminal failure with a retry button; clicking that button starts a new logical request. Authentication failures are terminal. Broader record exports and asynchronous delivery are not specified. Acceptance evidence consists of the successful-request scenario and a task to verify authenticated success, retries, terminal failure, and user retry. An implementer must decide how automatic retries relate to a creation that completed before its response timed out, and how non-authentication, non-timeout failures appear to the user.",
+      "coverage": [
+        "named-agent dispatch",
+        "Supplied cold packet only: design.md, proposal.md, specs/export/spec.md, tasks.md"
+      ],
+      "evidence": [
+        {
+          "path": "design.md",
+          "reference": "Design paragraph: endpoint, retries, logical requests, authentication, export contents, access, expiration, and synchronous response"
+        },
+        {
+          "path": "proposal.md",
+          "reference": "Why, What Changes, Capabilities, and Impact"
+        },
+        {
+          "path": "specs/export/spec.md",
+          "reference": "Requirement: Create export; Scenario: Request succeeds"
+        },
+        {
+          "path": "tasks.md",
+          "reference": "Task 1.1"
+        }
+      ],
+      "findings": [
+        {
+          "id": "C1",
+          "location": "design.md: automatic timeout retries and logical request semantics",
+          "scenario": "The export service creates a file, but its success response times out. The client repeats GET /exports/create without a request ID. The design distinguishes a user retry as a new logical request but does not establish whether automatic attempts reuse the original creation or create additional exports.",
+          "impact": "Implementations can create multiple files for one logical request and show terminal failure despite successful creation. The planning artifacts provide no criterion for deciding whether these outcomes are acceptable or require reconciliation.",
+          "severity": "major",
+          "resolution": "Specify the observable outcome of a timeout after successful server-side creation: either define how automatic attempts identify or recover the original export, or explicitly permit duplicate creations and define their lifecycle and the user-visible result. Include acceptance evidence for this case."
+        },
+        {
+          "id": "C2",
+          "location": "design.md: failure handling; tasks.md: Task 1.1",
+          "scenario": "The existing API returns a non-authentication error, such as an HTTP 500 response, without timing out. Only timeouts have retry rules, and only authentication failures are explicitly terminal.",
+          "impact": "An implementer must invent whether this response receives automatic retries, ends with the retry button, or follows another path. The terminal-failure verification task has no expected result for this ordinary failure case.",
+          "severity": "minor",
+          "resolution": "Define whether non-timeout API errors are retryable and what terminal state and retry controls they produce, with at least one acceptance case covering that policy."
+        }
+      ]
+    },
+    "adversarial-reviewer": {
+      "role": "adversarial-reviewer",
+      "status": "complete",
+      "reconstruction": "The change creates a JSON export of the authenticated customer profile, returns a download link synchronously, retries timeouts twice, and treats user retry as a new logical request. The design also specifies access restrictions and one-hour expiry and deletion. Two design decisions contradict the existing API contract.",
+      "coverage": [
+        "Dispatch mode: named-agent; independent grounded review",
+        "Planning packet: proposal.md, design.md, specs/export/spec.md, tasks.md",
+        "Repository evidence: contract.md",
+        "Read-only inspection; no project code executed"
+      ],
+      "evidence": [
+        {
+          "path": "openspec/changes/sample/.goldfish/reviews/602fda52-1a58-43b8-872c-66fcfdb46bca/cold-packet.json",
+          "reference": "Embedded proposal.md: Impact; design.md: design paragraph; specs/export/spec.md: Create export requirement and Request succeeds scenario; tasks.md: task 1.1"
+        },
+        {
+          "path": "contract.md",
+          "reference": "Line 2: supported endpoint, required request ID, timeout retry identity, and user retry identity"
+        }
+      ],
+      "findings": [
+        {
+          "id": "A1",
+          "location": "design.md: endpoint selection",
+          "scenario": "Implementing the specified GET /exports/create sends export creation to an endpoint that contract.md explicitly identifies as unsupported; the existing service requires POST /exports.",
+          "impact": "Export creation fails, preventing the successful download-link behavior required by specs/export/spec.md.",
+          "severity": "major",
+          "resolution": "Specify POST /exports consistently in the plan and include verification that creation uses the supported method and path."
+        },
+        {
+          "id": "A2",
+          "location": "design.md: request identity and timeout retries",
+          "scenario": "The design explicitly omits a request ID. contract.md requires a unique ID per logical request, reused across timeout retries. If creation succeeds but its response times out, the planned retries cannot preserve the identity required to avoid duplicate writes.",
+          "impact": "Requests violate the existing API contract, and timeout recovery lacks the service's required duplicate-write protection.",
+          "severity": "major",
+          "resolution": "Require one unique request ID for the initial attempt and all automatic timeout retries, and a fresh ID for each user retry. Include verification of ID reuse across timeouts and ID replacement on user retry."
+        }
+      ]
+    },
+    "adjudicator": {
+      "role": "adjudicator",
+      "status": "complete",
+      "reconstruction": "The plan adds synchronous JSON export of the authenticated customer profile through the existing export service, with bounded timeout retries and a user retry action. Repository evidence contradicts the planned endpoint and omission of request IDs. The timeout ambiguity identified by the cold reader is covered by the request-identity contradiction. Handling of non-timeout, non-authentication errors remains unspecified.",
+      "coverage": [
+        "Dispatch mode: named-agent",
+        "Both completed reviewer results independently adjudicated",
+        "Planning packet: proposal.md, design.md, specs/export/spec.md, tasks.md",
+        "Repository evidence: contract.md",
+        "Every original finding retained",
+        "Read-only inspection; no project code executed"
+      ],
+      "evidence": [
+        {
+          "path": ".goldfish-tmp/602fda52-1a58-43b8-872c-66fcfdb46bca/reviewers.json",
+          "reference": "Complete cold-reader and adversarial-reviewer results, including C1, C2, A1, and A2"
+        },
+        {
+          "path": "openspec/changes/sample/.goldfish/reviews/602fda52-1a58-43b8-872c-66fcfdb46bca/cold-packet.json",
+          "reference": "Embedded design.md: Design paragraph; proposal.md: Impact; specs/export/spec.md: Create export requirement and Request succeeds scenario; tasks.md: Task 1.1"
+        },
+        {
+          "path": "contract.md",
+          "reference": "Line 2: POST /exports, unsupported GET /exports/create, required request ID, timeout retry identity, and user retry identity"
+        }
+      ],
+      "findings": [
+        {
+          "id": "C1",
+          "location": "design.md: automatic timeout retries and logical request semantics",
+          "scenario": "Creation succeeds but its response times out, and the client retries without a request ID.",
+          "impact": "Automatic retries lack the identity required by the existing service to avoid duplicate writes.",
+          "severity": "major",
+          "resolution": "Require the same unique request ID for the initial attempt and automatic timeout retries, with a new ID for each user retry, and verify these identities.",
+          "disposition": "duplicate",
+          "duplicateOf": "A2",
+          "reason": "A2 identifies the same missing request identity and timeout-recovery consequence, grounded in contract.md line 2. Its resolution covers this scenario. Explicitly permitting duplicates, as suggested as one possible C1 resolution, would not satisfy the existing contract."
+        },
+        {
+          "id": "C2",
+          "location": "design.md: failure handling; tasks.md: Task 1.1",
+          "scenario": "The API returns an HTTP 500 response without timing out or reporting an authentication failure.",
+          "impact": "The plan does not specify whether this response is retried or which terminal state and retry control appear.",
+          "severity": "minor",
+          "resolution": "Define the retry and terminal-state policy for non-timeout, non-authentication API errors and include an acceptance case.",
+          "disposition": "accepted",
+          "reason": "The design paragraph specifies timeout retries and terminal authentication failures; contract.md line 2 addresses request identity but supplies no other error policy. Task 1.1 asks to verify terminal failure without resolving this localized gap."
+        },
+        {
+          "id": "A1",
+          "location": "design.md: endpoint selection",
+          "scenario": "Implementation uses the planned GET /exports/create endpoint.",
+          "impact": "The existing service does not support that endpoint, preventing successful export creation.",
+          "severity": "major",
+          "resolution": "Specify POST /exports in the plan and verify that export creation uses that method and path.",
+          "disposition": "accepted",
+          "reason": "The embedded design explicitly chooses GET /exports/create. Contract.md line 2 explicitly rejects it and requires POST /exports. This contradicts the proposal and specification's use of the existing export API."
+        },
+        {
+          "id": "A2",
+          "location": "design.md: request identity and timeout retries",
+          "scenario": "The initial creation and its automatic timeout retries omit request IDs, including when creation completed before its response timed out.",
+          "impact": "Requests violate the existing API contract and cannot use its required protection against duplicate writes.",
+          "severity": "major",
+          "resolution": "Require one unique request ID per logical request, reuse it across all automatic timeout retries, generate a fresh ID for user retry, and verify both behaviors.",
+          "disposition": "accepted",
+          "reason": "The embedded design explicitly says no request ID. Contract.md line 2 requires a unique ID per logical request, reuse on timeout retries, and a new ID on user retry. The design's statement that user retry creates a new logical request does not supply the required IDs."
+        }
+      ]
+    }
+  },
+  "findings": [
+    {
+      "id": "C1",
+      "location": "design.md: automatic timeout retries and logical request semantics",
+      "scenario": "Creation succeeds but its response times out, and the client retries without a request ID.",
+      "impact": "Automatic retries lack the identity required by the existing service to avoid duplicate writes.",
+      "severity": "major",
+      "resolution": "Require the same unique request ID for the initial attempt and automatic timeout retries, with a new ID for each user retry, and verify these identities.",
+      "disposition": "duplicate",
+      "duplicateOf": "A2",
+      "reason": "A2 identifies the same missing request identity and timeout-recovery consequence, grounded in contract.md line 2. Its resolution covers this scenario. Explicitly permitting duplicates, as suggested as one possible C1 resolution, would not satisfy the existing contract."
+    },
+    {
+      "id": "C2",
+      "location": "design.md: failure handling; tasks.md: Task 1.1",
+      "scenario": "The API returns an HTTP 500 response without timing out or reporting an authentication failure.",
+      "impact": "The plan does not specify whether this response is retried or which terminal state and retry control appear.",
+      "severity": "minor",
+      "resolution": "Define the retry and terminal-state policy for non-timeout, non-authentication API errors and include an acceptance case.",
+      "disposition": "accepted",
+      "reason": "The design paragraph specifies timeout retries and terminal authentication failures; contract.md line 2 addresses request identity but supplies no other error policy. Task 1.1 asks to verify terminal failure without resolving this localized gap."
+    },
+    {
+      "id": "A1",
+      "location": "design.md: endpoint selection",
+      "scenario": "Implementation uses the planned GET /exports/create endpoint.",
+      "impact": "The existing service does not support that endpoint, preventing successful export creation.",
+      "severity": "major",
+      "resolution": "Specify POST /exports in the plan and verify that export creation uses that method and path.",
+      "disposition": "accepted",
+      "reason": "The embedded design explicitly chooses GET /exports/create. Contract.md line 2 explicitly rejects it and requires POST /exports. This contradicts the proposal and specification's use of the existing export API."
+    },
+    {
+      "id": "A2",
+      "location": "design.md: request identity and timeout retries",
+      "scenario": "The initial creation and its automatic timeout retries omit request IDs, including when creation completed before its response timed out.",
+      "impact": "Requests violate the existing API contract and cannot use its required protection against duplicate writes.",
+      "severity": "major",
+      "resolution": "Require one unique request ID per logical request, reuse it across all automatic timeout retries, generate a fresh ID for user retry, and verify both behaviors.",
+      "disposition": "accepted",
+      "reason": "The embedded design explicitly says no request ID. Contract.md line 2 requires a unique ID per logical request, reuse on timeout retries, and a new ID on user retry. The design's statement that user retry creates a new logical request does not supply the required IDs."
+    }
+  ],
+  "revisionOffer": "Offer specific artifact revisions and wait for explicit acceptance."
+}

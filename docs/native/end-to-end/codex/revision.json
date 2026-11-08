@@ -1,0 +1,40 @@
+{
+  "runId": "602fda52-1a58-43b8-872c-66fcfdb46bca",
+  "createdAt": "2026-11-08T22:26:11.628Z",
+  "acceptedIds": [
+    "A1",
+    "A2"
+  ],
+  "outcomes": [
+    {
+      "id": "A1",
+      "status": "applied",
+      "reason": "Applied accepted endpoint correction only in design.md. Verification additions to tasks.md were not authorized and were deferred.",
+      "paths": [
+        "design.md"
+      ]
+    },
+    {
+      "id": "A2",
+      "status": "applied",
+      "reason": "Applied accepted logical-request ID behavior only in design.md: unique ID per logical export, same ID across timeout retries, new logical request and ID on user retry. Specification and task additions were not authorized and were deferred. No review or verification of the revision was performed.",
+      "paths": [
+        "design.md"
+      ]
+    },
+    {
+      "id": "C1",
+      "status": "deferred",
+      "reason": "User explicitly deferred every finding other than A1 and A2. No separate C1 edit was authorized; the original duplicate disposition remains unchanged.",
+      "paths": []
+    },
+    {
+      "id": "C2",
+      "status": "deferred",
+      "reason": "User explicitly deferred every finding other than A1 and A2; no non-timeout error policy was changed.",
+      "paths": []
+    }
+  ],
+  "freshness": "stale",
+  "next": "Offer a fresh review; wait for explicit invocation."
+}

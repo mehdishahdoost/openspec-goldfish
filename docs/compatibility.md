@@ -1,6 +1,6 @@
 # Compatibility
 
-Configuration references checked 2026-11-08. Claude native agent listing and Devin native skill loading passed. Native end-to-end review validation remains pending; installed binary versions below are observed, not claims that reviews passed.
+Configuration references checked 2026-11-08. Claude native agent listing and Devin native skill loading passed. Full native fixture review and separately approved revision passed for the versions below; see the end-to-end evidence linked at the bottom.
 
 | Harness | Observed version | Local skill / agents | Global configuration root |
 | --- | --- | --- | --- |
@@ -45,3 +45,5 @@ The explore-role-message path completed all four native roles on Devin 3000.12.2
 ### Claude native verification
 
 Claude 2.1.319 completed cold reading, both grounded-review fixtures and adjudication through named custom agents with plan permissions. Keep normal user authentication settings enabled when testing; project-only setting sources can exclude the working token configuration. The clean fixture produced one minor finding, so zero-findings calibration remains unverified. See [native evidence](native/claude-2.1.319.json).
+
+Full native fixture report persistence and separately approved revisions passed for all three current versions. See [end-to-end evidence](native/end-to-end/summary.json) and [acceptance details](acceptance.md#full-native-review-and-revision-workflow-verified).

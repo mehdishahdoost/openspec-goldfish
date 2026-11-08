@@ -38,5 +38,5 @@
 ## 6. Integrated acceptance
 
 - [x] 6.1 Install the packed tarball into isolated local/global destinations for all three harnesses; verify executable availability, agent/skill discovery assets, resource resolution from a different working directory, and multiple-harness coexistence.
-- [ ] 6.2 Run native harness smoke reviews using temporary projects for Claude Code, Codex, and Devin CLI; record actual versions, independent context behavior, no reviewer edits, report generation, and revision acceptance. If a runtime is unavailable, record the unverified target explicitly and do not claim this task complete.
+- [x] 6.2 Run native harness smoke reviews using temporary projects for Claude Code, Codex, and Devin CLI; record actual versions, independent context behavior, no reviewer edits, report generation, and revision acceptance. If a runtime is unavailable, record the unverified target explicitly and do not claim this task complete.
 - [x] 6.3 Run the full automated suite and strict OpenSpec validation; verify all capability scenarios have test or documented native acceptance coverage and record remaining limitations without publishing the package.

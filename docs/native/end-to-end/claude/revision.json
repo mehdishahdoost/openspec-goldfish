@@ -1,0 +1,94 @@
+{
+  "runId": "2a83a8be-c88b-424a-9238-ddb736b0c7e8",
+  "createdAt": "2026-11-08T22:24:50.243Z",
+  "acceptedIds": [
+    "A1",
+    "A2"
+  ],
+  "outcomes": [
+    {
+      "id": "A1",
+      "status": "applied",
+      "reason": "User explicitly accepted A1. design.md now specifies POST /exports, the creating endpoint documented in contract.md.",
+      "paths": [
+        "design.md"
+      ]
+    },
+    {
+      "id": "A2",
+      "status": "applied",
+      "reason": "User explicitly accepted A2. design.md now specifies one unique request ID per logical export request, reused unchanged for timeout retries, with a new ID for user retry.",
+      "paths": [
+        "design.md"
+      ]
+    },
+    {
+      "id": "C1",
+      "status": "deferred",
+      "reason": "Not accepted by user; deferred. Spec scenario gaps remain open.",
+      "paths": []
+    },
+    {
+      "id": "C2",
+      "status": "deferred",
+      "reason": "Not accepted by user; deferred. Attempt count and timeout values remain undecided.",
+      "paths": []
+    },
+    {
+      "id": "C3",
+      "status": "deferred",
+      "reason": "Not accepted by user; deferred. Error-class handling remains undecided.",
+      "paths": []
+    },
+    {
+      "id": "C4",
+      "status": "deferred",
+      "reason": "Not accepted by user; deferred. Duplicate-export policy remains undecided (duplicate of A2, which was accepted only for request-ID handling).",
+      "paths": []
+    },
+    {
+      "id": "C5",
+      "status": "deferred",
+      "reason": "Not accepted by user; deferred. Exported field list remains undecided.",
+      "paths": []
+    },
+    {
+      "id": "C6",
+      "status": "deferred",
+      "reason": "Not accepted by user; deferred. Expired-link response remains undecided.",
+      "paths": []
+    },
+    {
+      "id": "C7",
+      "status": "deferred",
+      "reason": "Not accepted by user; deferred. Duplicate of A1, whose accepted edit addresses the endpoint.",
+      "paths": []
+    },
+    {
+      "id": "A3",
+      "status": "deferred",
+      "reason": "Not accepted by user; deferred. Adjudicator dismissed this finding.",
+      "paths": []
+    },
+    {
+      "id": "A4",
+      "status": "deferred",
+      "reason": "Not accepted by user; deferred. Duplicate of C1; spec gaps remain open.",
+      "paths": []
+    },
+    {
+      "id": "A5",
+      "status": "deferred",
+      "reason": "Not accepted by user; deferred. Duplicate of C5; exported field list remains open.",
+      "paths": []
+    },
+    {
+      "id": "J1",
+      "status": "deferred",
+      "reason": "Not accepted by user; deferred. Auth-failure display remains unspecified.",
+      "paths": []
+    }
+  ],
+  "freshness": "stale",
+  "next": "Offer a fresh review; wait for explicit invocation."
+}
