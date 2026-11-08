@@ -79,3 +79,12 @@ test('revision acceptance, subset, decision gate, concurrency and outcomes',asyn
  assert.equal(revision.freshness,'stale');assert.match(revision.next,/wait for explicit/);
  assert.equal(JSON.parse(await readFile(path.join(run.dir,'report.json'))).freshness,'current');
 });
+test('review paths allow root ancestor aliases while rejecting symlinks inside the change',async()=>{
+ const t=await fixture();const alias=t.root+'-alias';await symlink(t.root,alias,'junction');
+ const change=path.join(alias,'change');await mkdir(change);await writeFile(path.join(change,'plan.md'),'Plan');
+ t.status.changeRoot=change;t.status.artifactPaths.plan.existingOutputPaths=[path.join(change,'plan.md')];
+ assert.equal((await snapshot(t)).files[0].content,'Plan');
+ const outside=await fixture();await symlink(outside.root,path.join(change,'linked'),'junction');
+ t.status.artifactPaths.plan.existingOutputPaths=[path.join(change,'linked','plan.md')];
+ await assert.rejects(snapshot(t),/Symlink/);
+});

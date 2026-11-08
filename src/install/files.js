@@ -3,13 +3,14 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 export const hash = value => createHash('sha256').update(value).digest('hex');
 export async function exists(file) { try { await lstat(file); return true; } catch(e) { if(e.code==='ENOENT') return false; throw e; } }
-// Reject symlinks in every existing component, including the destination itself.
+// Trust ancestors of the selected root (macOS /var is an alias), but reject
+// symlinks at the root and below, including the destination itself.
 export async function safePath(root, relative) {
   const target = path.resolve(root, relative);
   const rel = path.relative(path.resolve(root), target);
   if (!rel || rel.startsWith(`..${path.sep}`) || rel === '..' || path.isAbsolute(rel)) throw new Error(`Path escapes installation root: ${relative}`);
-  let current = path.parse(target).root;
-  for (const part of target.slice(current.length).split(path.sep)) {
+  let current = path.resolve(root);
+  for (const part of ['', ...rel.split(path.sep)]) {
     current = path.join(current, part);
     try { if ((await lstat(current)).isSymbolicLink()) throw new Error(`Symlink destination refused: ${current}`); }
     catch(e) { if(e.code!=='ENOENT') throw e; }

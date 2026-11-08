@@ -39,3 +39,11 @@ test('interrupted journal prevents writes',async()=>{
  const root=await temp(); await mkdir(path.join(root,'.goldfish-install')); await writeFile(path.join(root,'.goldfish-install/claude.pending'),'[]');
  await assert.rejects(commitFiles({root,harness:'claude',version:'1',files:{a:'a'}}),/Interrupted/);
 });
+test('system-style symlink ancestors are allowed but the selected root is not a symlink',async()=>{
+ const parent=await temp();const actual=path.join(parent,'actual');await mkdir(actual);
+ const alias=path.join(parent,'alias');await symlink(actual,alias,'junction');
+ const root=path.join(alias,'project');await mkdir(root);
+ await commitFiles({root,harness:'claude',version:'1',files:{'skill':'installed'}});
+ assert.equal(await readFile(path.join(actual,'project','skill'),'utf8'),'installed');
+ await assert.rejects(commitFiles({root:alias,harness:'claude',version:'1',files:{'skill':'bad'}}),/Symlink/);
+});

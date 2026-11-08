@@ -9,8 +9,9 @@ export const digest=x=>createHash('sha256').update(x).digest('hex');
 export async function contained(root,file) {
  const base=path.resolve(root),target=path.resolve(file),rel=path.relative(base,target);
  if(!rel||rel==='..'||rel.startsWith('..'+path.sep)||path.isAbsolute(rel))throw new Error(`Path outside change: ${file}`);
- let cursor=path.parse(target).root;
- for(const part of target.slice(cursor.length).split(path.sep)) {
+ let cursor=base;
+ // Ancestors belong to the selected root; system aliases such as /var are valid.
+ for(const part of ['',...rel.split(path.sep)]) {
   cursor=path.join(cursor,part);
   try{if((await lstat(cursor)).isSymbolicLink())throw new Error(`Symlink refused: ${cursor}`);}catch(e){if(e.code!=='ENOENT')throw e;}
  }
