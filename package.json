@@ -3,9 +3,45 @@
   "version": "0.1.0",
   "description": "Independent cold-read and adversarial review for OpenSpec proposals",
   "type": "module",
-  "bin": {"openspec-goldfish": "bin/openspec-goldfish.js"},
-  "engines": {"node": ">=22"},
-  "files": ["bin/", "src/", "resources/", "templates/", "assets/", "docs/"],
-  "scripts": {"test": "node --test", "check": "node --check bin/openspec-goldfish.js"},
-  "license": "UNLICENSED"
+  "bin": {
+    "openspec-goldfish": "bin/openspec-goldfish.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "resources/",
+    "templates/",
+    "assets/",
+    "docs/review.md",
+    "docs/compatibility.md",
+    "docs/releasing.md"
+  ],
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check bin/openspec-goldfish.js"
+  },
+  "license": "MIT",
+  "author": "Mehdi Shahdoost",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mehdishahdoost/openspec-goldfish.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mehdishahdoost/openspec-goldfish/issues"
+  },
+  "homepage": "https://mehdishahdoost.github.io/openspec-goldfish/",
+  "keywords": [
+    "openspec",
+    "code-review",
+    "ai-agents",
+    "claude-code",
+    "codex",
+    "devin"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
 }

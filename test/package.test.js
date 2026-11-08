@@ -12,10 +12,16 @@ const root=fileURLToPath(new URL('../',import.meta.url));
 test('packed package installs all adapters and bundled runtime works away from package',async()=>{
  const temp=await mkdtemp(path.join(os.tmpdir(),'goldfish-pack-'));const npm=process.execPath; const npmCli=process.env.npm_execpath || (process.platform==='win32'?path.join(path.dirname(process.execPath),'node_modules/npm/bin/npm-cli.js'):await realpath(path.join(path.dirname(process.execPath),'npm')));
  const output=JSON.parse(exec(npm,[npmCli,'pack','--json','--pack-destination',temp,'--cache',path.join(temp,'cache')],{cwd:root,encoding:'utf8'}));
- assert.ok(!output[0].files.some(f=>f.path.startsWith('test/')||f.path.startsWith('openspec/')));
+ const packed=new Set(output[0].files.map(f=>f.path));
+ for(const required of ['LICENSE','README.md','package.json','bin/openspec-goldfish.js','resources/protocol/workflow.md','src/review/tool.js'])assert.ok(packed.has(required),`Missing ${required}`);
+ for(const prefix of ['test/','openspec/','website/','scripts/','docs/native/','docs/releases/'])assert.ok(![...packed].some(f=>f.startsWith(prefix)),`Unexpected ${prefix}`);
  const prefix=path.join(temp,'consumer');await mkdir(prefix);
  exec(npm,[npmCli,'install','--prefix',prefix,'--ignore-scripts','--no-audit','--no-fund', '--cache',path.join(temp,'cache'),path.join(temp,output[0].filename)],{encoding:'utf8'});
  const pkg=path.join(prefix,'node_modules/openspec-goldfish');
+ const metadata=JSON.parse(await readFile(path.join(pkg,'package.json'),'utf8'));
+ assert.equal(metadata.license,'MIT');assert.equal(metadata.name,'openspec-goldfish');
+ assert.match(metadata.repository.url,/github.com\/mehdishahdoost\/openspec-goldfish/);
+ assert.match(await readFile(path.join(pkg,'LICENSE'),'utf8'),/MIT License/);
  const {install}=await import(pathToFileURL(path.join(pkg,'src/install/index.js')).href);
  const {locations}=await import(pathToFileURL(path.join(pkg,'src/adapters/index.js')).href);
  const project=path.join(temp,'project');await mkdir(project);
