@@ -1,0 +1,64 @@
+{
+  "runId": "c6e51339-6320-458b-916b-f0833e347111",
+  "createdAt": "2026-11-08T22:29:32.410Z",
+  "acceptedIds": [
+    "A1",
+    "A2"
+  ],
+  "outcomes": [
+    {
+      "id": "A1",
+      "status": "applied",
+      "reason": "Applied accepted endpoint correction in design.md: export creation uses POST /exports and not GET /exports/create.",
+      "paths": [
+        "design.md"
+      ]
+    },
+    {
+      "id": "A2",
+      "status": "applied",
+      "reason": "Applied accepted request-ID semantics in design.md: unique request ID per logical export, reused for timeout retries, new logical request and ID on user retry.",
+      "paths": [
+        "design.md"
+      ]
+    },
+    {
+      "id": "A3",
+      "status": "deferred",
+      "reason": "Deferred by user; no spec or task edits accepted in this revision.",
+      "paths": []
+    },
+    {
+      "id": "A4",
+      "status": "deferred",
+      "reason": "Deferred by user; no design decision or edit accepted for POST /exports contract assumptions.",
+      "paths": []
+    },
+    {
+      "id": "A5",
+      "status": "deferred",
+      "reason": "Deferred by user; retry wording clarification not accepted in this revision.",
+      "paths": []
+    },
+    {
+      "id": "C1",
+      "status": "deferred",
+      "reason": "Deferred by user; duplicate of A1 and no separate edit applied.",
+      "paths": []
+    },
+    {
+      "id": "C2",
+      "status": "deferred",
+      "reason": "Deferred by user; duplicate of A5 and no separate edit applied.",
+      "paths": []
+    },
+    {
+      "id": "C3",
+      "status": "deferred",
+      "reason": "Deferred by user; duplicate of A3 and no separate edit applied.",
+      "paths": []
+    }
+  ],
+  "freshness": "stale",
+  "next": "Offer a fresh review; wait for explicit invocation."
+}

@@ -5,7 +5,7 @@
 1. Confirm explicit user invocation of Goldfish. Work after proposal and before implementation only. If the user says implementation has begun, stop. Do not invoke OpenSpec apply or edit any artifact during review.
 2. Run `openspec context --json` and `openspec list --json`, retaining `--store <id>` if explicitly selected. Stop on unresolved roots/stores; never initialize OpenSpec. Select the named change or the sole active change. Ask if ambiguous. Read status and apply instruction metadata solely to discover planning prerequisites and progress. Stop if planning is incomplete or implementation has started.
 3. Read applicable explicit project constraints from the resolved OpenSpec configuration and project instructions; extract only constraints, never author discussion, rationale, prior findings or implementation details. Save the bounded constraints as a temporary UTF-8 file. Resolve the target repository if the planning home is a store; ask if unclear.
-4. Resolve this skill's absolute runtime/tool.js path. Run from the user's project:
+4. Obtain the actual harness version using its `--version` command or an explicit version measured by the caller. Do not infer it from documentation or prior reports. If unavailable, ask instead of guessing. Resolve this skill's absolute runtime/tool.js path. Run from the user's project:
    `node "<runtime/tool.js>" start --change "<name>" --harness "<harness>" --harness-version "<actual version>" --constraints "<constraints-file>"`
    Append `--store "<id>"` when selected. Omit --constraints if none exist. The helper discovers CLI paths, checks prerequisites and creates a unique run, inputs.json and cold-packet.json. It does not start any model.
 
