@@ -1,0 +1,16 @@
+{
+  "date": "2026-11-08",
+  "harness": "devin",
+  "version": "3000.12.28",
+  "permissionMode": "auto",
+  "skillDiscovery": {"status": "passed", "name": "openspec-goldfish", "provider": "Devin", "triggers": ["user"]},
+  "dispatch": {"status": "failed", "requestedProfile": "goldfish-cold-reader", "error": "Subagent failed to start.", "profileRegistered": false},
+  "attempts": ["Fresh temporary workspace", "Same workspace initialized as a Git repository; fresh Devin session"],
+  "observations": [
+    "Project .devin/agents definitions exist but Goldfish profiles were absent from available run_subagent profiles in both sessions.",
+    "Built-in subagent_explore and subagent_general profiles and installed EGM plugin profiles were available.",
+    "No substitute profile or simulated review was used.",
+    "No reviewer results were returned; review quality and full workflow remain unverified.",
+    "This CLI discovers the native skill as openspec-goldfish, without the devin: prefix used by the earlier tested version."
+  ]
+}

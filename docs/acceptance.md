@@ -54,3 +54,9 @@ Tasks 4.1, 4.2, and 6.2 remain pending until actual independent reviewer results
 Codex CLI 0.167.0 completed four fresh native role-message subagents: cold reader, contradiction reviewer, clean reviewer and adjudicator. Parent history was excluded with `fork_turns: "none"`. The cold reader identified missing retry bounds without receiving the hidden author decision; the contradiction reviewer cited both planning and API contract; the clean reviewer returned no findings. The adjudicator retained C1, C2 and A1 with reasoned dispositions. Fixture hashes remained unchanged. Actual returned JSON and dispatch receipts are retained in [native evidence](native/codex-0.167.0.json).
 
 The adapter now chooses named dispatch only where the native schema exposes a selector; otherwise it supplies the canonical role instructions in a fresh native agent message and records that mode. This verifies tasks 4.1 and 4.2. Task 6.2 remains open: full report persistence, accepted native revisions and all three harnesses have not been verified end to end.
+
+## Devin 3000.12.28 native test
+
+The current Devin CLI authenticated and loaded `.devin/skills/openspec-goldfish` with user-only triggers. It exposes this skill as `/openspec-goldfish`; `devin skills show devin:openspec-goldfish` does not resolve in this version.
+
+A bounded `run_subagent` call requesting `goldfish-cold-reader` failed with `Subagent failed to start.` The available profile inventory included built-in and installed plugin profiles, but no project-local Goldfish profiles. Repeating in a fresh session after initializing the temporary workspace as a Git repository produced the same failure. Thus Git-root discovery was ruled out as the sole cause. Project-profile dispatch needs a compatibility fix; no substitute reviewer was used and task 6.2 remains open. See [test evidence](native/devin-3000.12.28.json).
