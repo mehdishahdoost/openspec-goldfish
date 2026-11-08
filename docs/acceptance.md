@@ -60,3 +60,9 @@ The adapter now chooses named dispatch only where the native schema exposes a se
 The current Devin CLI authenticated and loaded `.devin/skills/openspec-goldfish` with user-only triggers. It exposes this skill as `/openspec-goldfish`; `devin skills show devin:openspec-goldfish` does not resolve in this version.
 
 A bounded `run_subagent` call requesting `goldfish-cold-reader` failed with `Subagent failed to start.` The available profile inventory included built-in and installed plugin profiles, but no project-local Goldfish profiles. Repeating in a fresh session after initializing the temporary workspace as a Git repository produced the same failure. Thus Git-root discovery was ruled out as the sole cause. Project-profile dispatch needs a compatibility fix; no substitute reviewer was used and task 6.2 remains open. See [test evidence](native/devin-3000.12.28.json).
+
+## Devin dispatch compatibility fix verified
+
+Devin 3000.12.28 completed cold-reader, contradiction reviewer, clean reviewer and adjudicator roles through four new native `subagent_explore` conversations using explicit canonical role messages. Custom Goldfish profiles remain unregistered, but that no longer prevents native isolated review. Cold reading identified missing retry rules without the author-only count; grounded review cited both conflicting sources; adjudication retained all eight findings from the first two reviewers. Input fixture hashes remained unchanged. Actual outputs and receipts are saved in [fixed native evidence](native/devin-3000.12.28-fixed.json).
+
+The clean reviewer returned four findings about retry/request-ID semantics and coverage. This probe therefore does not demonstrate a zero-findings result for Devin; these findings have not been adjudicated and are not automatically classified as false positives. Full report/revision execution and cross-harness task 6.2 remain pending. Automated tests: 33 passed; strict OpenSpec validation passed.

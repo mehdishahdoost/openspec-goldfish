@@ -6,7 +6,7 @@ Configuration references checked 2026-11-08. Claude native agent listing and Dev
 | --- | --- | --- | --- |
 | Claude Code | 2.1.116 | `.claude/skills/openspec-goldfish` / `.claude/agents` | `CLAUDE_CONFIG_DIR` or `~/.claude` |
 | Codex CLI | 0.167.0 | `.agents/skills/openspec-goldfish` / `.codex/agents` | `CODEX_HOME` or `~/.codex` |
-| Devin CLI | 3000.11.234 | `.devin/skills/openspec-goldfish` / `.devin/agents` | `$XDG_CONFIG_HOME/devin` or `~/.config/devin`; `%APPDATA%/devin` on Windows |
+| Devin CLI | 3000.12.28 | `.devin/skills/openspec-goldfish` / `.devin/agents` | `$XDG_CONFIG_HOME/devin` or `~/.config/devin`; `%APPDATA%/devin` on Windows |
 
 Goldfish uses Claude's `disable-model-invocation`, Codex's `policy.allow_implicit_invocation: false`, and Devin's `triggers: [user]` for manual-only skill invocation. The shared protocol also requires explicit invocation. Codex global skills use its supported legacy `skills/` directory to avoid collisions with Devin's shared `.agents` discovery.
 
@@ -22,7 +22,7 @@ Primary references:
 
 Run `npm test` for installation, protocol-helper and packaging fixtures. Native smoke reviews must separately confirm agent loading, fresh contexts, review quality, unchanged artifacts, report output and accepted revisions.
 
-Devin imports Claude skills too. When both adapters are installed, use `/devin:openspec-goldfish` to select the native Devin workflow; an unqualified name can select the Claude provider. `devin skills show devin:openspec-goldfish` confirms the intended provider.
+Earlier tested Devin 3000.11.234 imported Claude skills and exposed `/devin:openspec-goldfish` to disambiguate providers. Devin 3000.12.28 exposes the native skill as `/openspec-goldfish`. Use `devin skills list` and `devin skills show` to confirm the provider in your version.
 
 See [acceptance record](acceptance.md) for native loading results, blocked model smoke checks, and remaining verification steps.
 
@@ -32,4 +32,12 @@ Inspect the exposed spawn schema. If it supports custom-agent selection, use the
 
 ### Devin version-specific verification
 
-Devin 3000.12.28 recognizes the native skill as `/openspec-goldfish` (without the earlier version's provider prefix). Native Goldfish profile dispatch currently fails: the project `.devin/agents` files are present but absent from the session's available profiles, both with and without a Git root. Treat this version's adapter as unverified for execution. See [test evidence](native/devin-3000.12.28.json).
+Devin 3000.12.28 recognizes the native skill as `/openspec-goldfish` (without the earlier version's provider prefix). Native Goldfish profile dispatch currently fails: the project `.devin/agents` files are present but absent from the session's available profiles, both with and without a Git root. This initial failure is resolved by the native explore-role-message compatibility path verified below. See [initial test evidence](native/devin-3000.12.28.json).
+
+### Devin dispatch compatibility path
+
+Select registered Goldfish custom profiles when available. Where project profiles are missing from the registry, create a new `subagent_explore` conversation for each role, supplying canonical principles, role instructions, result contract and the bounded role input. Devin documents separate subagent conversation chains without parent history; the built-in explore profile enforces its own read-only tools. Record `explore-role-message` in coverage. Do not resume previous reviewer contexts or use unrelated plugin profiles. If native dispatch is denied or unavailable, report incomplete.
+
+Current CLI 3000.12.28 uses `/openspec-goldfish`; for earlier versions or collisions, use the command shown by `devin skills list` and confirm its provider with `devin skills show`.
+
+The explore-role-message path completed all four native roles on Devin 3000.12.28. See [verified dispatch evidence](native/devin-3000.12.28-fixed.json). The clean fixture produced four candidate findings, so clean-case calibration and full workflow acceptance remain open.

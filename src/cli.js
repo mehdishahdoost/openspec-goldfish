@@ -23,5 +23,5 @@ export async function main(args) {
   const result = await install(options);
   console.log(`Goldfish installed for ${options.harness} (${options.scope}).`);
   for (const file of result.paths) console.log(`  ${file}`);
-  console.log(`Restart your harness if needed. Invoke ${options.harness === 'codex' ? '$' : options.harness === 'devin' ? '/devin:' : '/'}openspec-goldfish <change-name> manually after proposal, before implementation.`);
+  console.log(`Restart your harness if needed. Invoke ${options.harness === 'codex' ? '$' : '/'}openspec-goldfish <change-name> manually after proposal, before implementation.`);
 }

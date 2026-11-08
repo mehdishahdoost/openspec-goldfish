@@ -55,3 +55,13 @@ test('Codex supports native fresh role messages without pretending labels select
  assert.match(instructions,/Record dispatch as named-agent or fresh-role-message/);
  assert.match(instructions,/never simulate reviewers/);
 });
+test('Devin keeps independent read-only review available when local profiles are not registered',async()=>{
+ const {files,skill}=await render({harness:'devin',scope:'local',cwd:'/tmp/project'});
+ const instructions=files[`${skill}/SKILL.md`];
+ assert.match(instructions,/when registered/);
+ assert.match(instructions,/native read-only subagent_explore/);
+ assert.match(instructions,/new independent conversation for each role/);
+ assert.match(instructions,/Do not resume an author or previous reviewer context/);
+ assert.match(instructions,/explore-role-message/);
+ assert.match(instructions,/unavailable or denied, report incomplete/);
+});

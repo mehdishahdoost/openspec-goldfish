@@ -35,7 +35,7 @@ Complete your OpenSpec proposal, then invoke in your harness:
 ```text
 Claude Code: /openspec-goldfish <change-name>
 Codex:       $openspec-goldfish <change-name>
-Devin CLI:   /devin:openspec-goldfish <change-name>
+Devin CLI:   /openspec-goldfish <change-name>
 ```
 
 ```text
