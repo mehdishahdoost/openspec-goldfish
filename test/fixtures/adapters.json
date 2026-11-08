@@ -1,0 +1,5 @@
+{
+  "claude": {"localSkill": ".claude/skills/openspec-goldfish", "localAgents": ".claude/agents", "globalRoot": ".claude", "extension": "md"},
+  "codex": {"localSkill": ".agents/skills/openspec-goldfish", "localAgents": ".codex/agents", "globalRoot": ".codex", "extension": "toml"},
+  "devin": {"localSkill": ".devin/skills/openspec-goldfish", "localAgents": ".devin/agents", "globalRoot": ".config/devin", "extension": "md"}
+}

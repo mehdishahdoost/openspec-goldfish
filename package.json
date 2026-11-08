@@ -1,0 +1,11 @@
+{
+  "name": "openspec-goldfish",
+  "version": "0.1.0",
+  "description": "Independent cold-read and adversarial review for OpenSpec proposals",
+  "type": "module",
+  "bin": {"openspec-goldfish": "bin/openspec-goldfish.js"},
+  "engines": {"node": ">=22"},
+  "files": ["bin/", "src/", "resources/", "templates/", "assets/", "docs/"],
+  "scripts": {"test": "node --test", "check": "node --check bin/openspec-goldfish.js"},
+  "license": "UNLICENSED"
+}
