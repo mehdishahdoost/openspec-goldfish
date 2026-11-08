@@ -4,7 +4,7 @@ Configuration references checked 2026-11-08. Claude native agent listing and Dev
 
 | Harness | Observed version | Local skill / agents | Global configuration root |
 | --- | --- | --- | --- |
-| Claude Code | 2.1.116 | `.claude/skills/openspec-goldfish` / `.claude/agents` | `CLAUDE_CONFIG_DIR` or `~/.claude` |
+| Claude Code | 2.1.319 | `.claude/skills/openspec-goldfish` / `.claude/agents` | `CLAUDE_CONFIG_DIR` or `~/.claude` |
 | Codex CLI | 0.167.0 | `.agents/skills/openspec-goldfish` / `.codex/agents` | `CODEX_HOME` or `~/.codex` |
 | Devin CLI | 3000.12.28 | `.devin/skills/openspec-goldfish` / `.devin/agents` | `$XDG_CONFIG_HOME/devin` or `~/.config/devin`; `%APPDATA%/devin` on Windows |
 
@@ -41,3 +41,7 @@ Select registered Goldfish custom profiles when available. Where project profile
 Current CLI 3000.12.28 uses `/openspec-goldfish`; for earlier versions or collisions, use the command shown by `devin skills list` and confirm its provider with `devin skills show`.
 
 The explore-role-message path completed all four native roles on Devin 3000.12.28. See [verified dispatch evidence](native/devin-3000.12.28-fixed.json). The clean fixture produced four candidate findings, so clean-case calibration and full workflow acceptance remain open.
+
+### Claude native verification
+
+Claude 2.1.319 completed cold reading, both grounded-review fixtures and adjudication through named custom agents with plan permissions. Keep normal user authentication settings enabled when testing; project-only setting sources can exclude the working token configuration. The clean fixture produced one minor finding, so zero-findings calibration remains unverified. See [native evidence](native/claude-2.1.319.json).

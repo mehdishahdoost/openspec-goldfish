@@ -70,3 +70,13 @@ The clean reviewer returned four findings about retry/request-ID semantics and c
 ## Claude 2.1.319 retry
 
 On 2026-11-08, a fresh temporary project was installed with the Claude adapter and quality fixtures. The native smoke request used plan permissions and prohibited edits. Claude returned `is_error: true` before review: `Failed to authenticate: this login reached its time limit and cannot be renewed.` The CLI requested `claude auth login`, or `claude setup-token` with `CLAUDE_CODE_OAUTH_TOKEN` for unattended jobs. Authentication status still reported logged in; repeating status without that environment variable selected the same OAuth-token authentication method. No reviewer execution or findings were observed. Native Claude acceptance remains pending reauthentication.
+
+## Claude authentication test correction
+
+A subsequent retry identified a test-configuration mismatch: using `--setting-sources project` excluded user settings containing the working authentication configuration, leaving an expired stored login selected instead. With normal user settings enabled, Claude 2.1.319 completed a minimal API request successfully. The earlier blanket recommendation to reauthenticate does not apply to this setup; native Goldfish testing must retain the user's normal authentication settings. No credential values were recorded or modified.
+
+## Claude native execution verified
+
+Claude Code 2.1.319 completed all four named native role instances with normal user authentication settings enabled and plan permissions. The cold reader identified missing retry rules without the hidden author count, the grounded reviewer cited both planning and API contract, and adjudication retained C1–C4 and A1–A3 with reasoned dispositions. The clean reviewer returned one minor request-ID reuse finding; this run does not demonstrate an empty finding set. No permission denials occurred and fixture hashes were unchanged. Actual role outputs are retained in [Claude evidence](native/claude-2.1.319.json).
+
+No Claude adapter change or user reauthentication was required. The prior authentication failure was caused by the probe excluding user settings containing working authentication configuration. Task 6.2 remains open because full native report persistence and accepted revisions across all harnesses have not been exercised.
