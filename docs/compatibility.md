@@ -24,7 +24,7 @@ Run `npm test` for installation, protocol-helper and packaging fixtures. Native 
 
 Earlier tested Devin 3000.11.234 imported Claude skills and exposed `/devin:openspec-goldfish` to disambiguate providers. Devin 3000.12.28 exposes the native skill as `/openspec-goldfish`. Use `devin skills list` and `devin skills show` to confirm the provider in your version.
 
-See [acceptance record](acceptance.md) for native loading results, blocked model smoke checks, and remaining verification steps.
+See [acceptance record](https://github.com/mehdishahdoost/openspec-goldfish/blob/main/docs/acceptance.md) for native loading results, blocked model smoke checks, and remaining verification steps.
 
 ### Codex dispatch capability
 
@@ -32,7 +32,7 @@ Inspect the exposed spawn schema. If it supports custom-agent selection, use the
 
 ### Devin version-specific verification
 
-Devin 3000.12.28 recognizes the native skill as `/openspec-goldfish` (without the earlier version's provider prefix). Native Goldfish profile dispatch currently fails: the project `.devin/agents` files are present but absent from the session's available profiles, both with and without a Git root. This initial failure is resolved by the native explore-role-message compatibility path verified below. See [initial test evidence](native/devin-3000.12.28.json).
+Devin 3000.12.28 recognizes the native skill as `/openspec-goldfish` (without the earlier version's provider prefix). Native Goldfish profile dispatch currently fails: the project `.devin/agents` files are present but absent from the session's available profiles, both with and without a Git root. This initial failure is resolved by the native explore-role-message compatibility path verified below. See [initial test evidence](https://github.com/mehdishahdoost/openspec-goldfish/blob/main/docs/native/devin-3000.12.28.json).
 
 ### Devin dispatch compatibility path
 
@@ -40,10 +40,10 @@ Select registered Goldfish custom profiles when available. Where project profile
 
 Current CLI 3000.12.28 uses `/openspec-goldfish`; for earlier versions or collisions, use the command shown by `devin skills list` and confirm its provider with `devin skills show`.
 
-The explore-role-message path completed all four native roles on Devin 3000.12.28. See [verified dispatch evidence](native/devin-3000.12.28-fixed.json). The clean fixture produced four candidate findings, so clean-case calibration and full workflow acceptance remain open.
+The explore-role-message path completed all four native roles on Devin 3000.12.28. See [verified dispatch evidence](https://github.com/mehdishahdoost/openspec-goldfish/blob/main/docs/native/devin-3000.12.28-fixed.json). The clean fixture produced four candidate findings, so clean-case calibration and full workflow acceptance remain open.
 
 ### Claude native verification
 
-Claude 2.1.319 completed cold reading, both grounded-review fixtures and adjudication through named custom agents with plan permissions. Keep normal user authentication settings enabled when testing; project-only setting sources can exclude the working token configuration. The clean fixture produced one minor finding, so zero-findings calibration remains unverified. See [native evidence](native/claude-2.1.319.json).
+Claude 2.1.319 completed cold reading, both grounded-review fixtures and adjudication through named custom agents with plan permissions. Keep normal user authentication settings enabled when testing; project-only setting sources can exclude the working token configuration. The clean fixture produced one minor finding, so zero-findings calibration remains unverified. See [native evidence](https://github.com/mehdishahdoost/openspec-goldfish/blob/main/docs/native/claude-2.1.319.json).
 
-Full native fixture report persistence and separately approved revisions passed for all three current versions. See [end-to-end evidence](native/end-to-end/summary.json) and [acceptance details](acceptance.md#full-native-review-and-revision-workflow-verified).
+Full native fixture report persistence and separately approved revisions passed for all three current versions. See [end-to-end evidence](https://github.com/mehdishahdoost/openspec-goldfish/blob/main/docs/native/end-to-end/summary.json) and [acceptance details](https://github.com/mehdishahdoost/openspec-goldfish/blob/main/docs/acceptance.md#full-native-review-and-revision-workflow-verified).

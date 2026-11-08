@@ -1,0 +1,55 @@
+name: Publish npm
+on:
+  release:
+    types: [published]
+permissions:
+  contents: read
+concurrency:
+  group: npm-release
+  cancel-in-progress: false
+jobs:
+  verify:
+    if: ${{ !github.event.release.prerelease && !github.event.release.draft }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node: [22, 24]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: node scripts/check-release.mjs "$RELEASE_TAG"
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+      - run: npm test
+      - run: npm pack --dry-run
+  publish:
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - run: npm install --global npm@11
+      - run: node scripts/check-release.mjs "$RELEASE_TAG"
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+      - run: npm test
+      - run: npm pack --pack-destination "$RUNNER_TEMP"
+      - name: Publish or verify an already bootstrapped release
+        run: node scripts/publish-release.mjs "$RUNNER_TEMP"
