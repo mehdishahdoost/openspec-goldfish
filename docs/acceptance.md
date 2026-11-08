@@ -38,3 +38,13 @@ These checks are required before claiming native review support is fully verifie
 | Accepted revisions | review.test.js no acceptance, subset, material decision, concurrent edit, outcomes | Native author-context editing and confirmation behavior |
 
 Automated fixtures validate deterministic behavior. They do not establish model judgment quality or prove the harness obeys every instruction.
+
+## Retry after filesystem restrictions were lifted
+
+On 2026-11-08, all three CLIs were retried in a fresh temporary workspace with current Goldfish adapters and the seeded quality fixtures.
+
+- Claude reached the API but returned HTTP 401: its OAuth access token has expired. A logged-in status alone did not establish a usable session; reauthentication is required.
+- Codex initialized successfully, but its available native `collaboration.spawn_agent` tool had no selector for installed custom agents. Fresh contexts were supported, but the named agent dispatch required by this adapter was unavailable. It correctly reported all three quality checks as not run rather than simulating reviewers.
+- Devin authenticated successfully. Its first attempt rejected a tool requiring confirmation in noninteractive mode. With explicit `--permission-mode auto`, it read the skill and fixtures, but all three native `goldfish-*` profile launches failed before starting. Further inspection also required confirmation unavailable in print mode. No reviewer findings were returned, so quality checks did not pass.
+
+Tasks 4.1, 4.2, and 6.2 remain pending until actual independent reviewer results and the full workflow are observed. Codex needs an adapter compatibility decision or a runtime exposing native custom-agent selection; lifting filesystem restrictions alone does not resolve that limitation.
