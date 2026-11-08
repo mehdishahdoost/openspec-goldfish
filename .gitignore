@@ -1,0 +1,6 @@
+node_modules/
+*.tgz
+coverage/
+
+# Generated local OpenSpec workflow skills
+.agents/skills/

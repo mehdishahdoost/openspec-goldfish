@@ -1,0 +1,275 @@
+{
+  "date": "2026-11-08",
+  "harness": "claude",
+  "version": "2.1.319",
+  "dispatch": "named-agent",
+  "permissionMode": "plan",
+  "settings": "Normal user settings enabled; project-only settings excluded working authentication",
+  "isError": false,
+  "permissionDenials": [],
+  "scope": "Native review-role execution; full report/revision workflow not exercised",
+  "receipts": [
+    {
+      "type": "goldfish-cold-reader",
+      "status": "completed",
+      "toolUses": 0
+    },
+    {
+      "type": "goldfish-adversarial-reviewer",
+      "input": "contradiction",
+      "status": "completed",
+      "toolUses": 0
+    },
+    {
+      "type": "goldfish-adversarial-reviewer",
+      "input": "clean",
+      "status": "completed",
+      "toolUses": 0
+    },
+    {
+      "type": "goldfish-adjudicator",
+      "status": "completed",
+      "toolUses": 0
+    }
+  ],
+  "observations": [
+    "Hidden retry count withheld from cold reader.",
+    "Both sides of API conflict cited.",
+    "All seven original findings retained by adjudicator.",
+    "Clean reviewer returned one minor request-ID reuse finding; zero-findings check not demonstrated.",
+    "Input fixture hashes unchanged."
+  ],
+  "artifactHashes": {
+    "clean.md": "5e692866fbd62868d1759881cbe69c69772a1fa647eabd0355958941499dc10e",
+    "ambiguous.md": "08b43738efc78bcf6a1a033572fc025a42b20920ba921d5ae48b925110cd4da9",
+    "contradiction.md": "a48a5389fe79ed8f06e41f5a5d01177ca981b3ae4f25a00167f52dcfbbf6f774",
+    "contract.md": "79c52d14f5fb87e27af585a0879bbf84352a0af21e9ac9ca945e121598378337"
+  },
+  "results": [
+    {
+      "role": "cold-reader",
+      "status": "complete",
+      "reconstruction": "The proposal intends a feature where a user requests an export of a customer's records into a downloadable file and gets a download link when it succeeds. Failed exports should be retried. Scope is only loosely stated. Nothing is said about export format, which records are included, who may export, or whether export is synchronous or asynchronous. Acceptance evidence is not defined beyond a link appearing on success. An implementer would have to invent the retry policy (what counts as a failure, how many attempts, backoff, whether retry is automatic or user-triggered, and what happens when retries are exhausted), the user's feedback on failure, link lifetime and security, and the file format and size limits.",
+      "coverage": [
+        "ambiguous.md (entire artifact, 3 lines of content)"
+      ],
+      "evidence": [
+        {
+          "path": "ambiguous.md",
+          "reference": "Line 3: 'Retry failed exports.'"
+        },
+        {
+          "path": "ambiguous.md",
+          "reference": "Line 5: 'receives a download link on success'"
+        },
+        {
+          "path": "ambiguous.md",
+          "reference": "Line 3: 'Export a customer's records to a downloadable file.'"
+        }
+      ],
+      "findings": [
+        {
+          "id": "C1",
+          "location": "ambiguous.md: 'Retry failed exports.'",
+          "scenario": "An export fails because of a transient error, or because of a permanent one such as bad data or a permission problem. The text does not say which failures are retried, how many times, with what delay, or whether the retry is automatic or user-initiated.",
+          "impact": "Implementers may retry permanent failures forever, never retry transient ones, or produce duplicate exports. Tests cannot be written to a shared standard.",
+          "severity": "major",
+          "resolution": "The artifact specifies retryable versus non-retryable failure classes, the maximum attempts, the backoff, who triggers the retry, and the final state once retries are exhausted. Each is testable."
+        },
+        {
+          "id": "C2",
+          "location": "ambiguous.md: line 5, 'receives a download link on success'",
+          "scenario": "The export ultimately fails after retries, or takes a long time. The user's experience is unspecified: whether they wait synchronously, get notified later, or see an error. The text only covers the success path.",
+          "impact": "The user may be left hanging with no feedback, and the UI and API contract diverge between implementers.",
+          "severity": "major",
+          "resolution": "The artifact defines the request flow (sync or async), the status states (pending, retrying, failed, succeeded), and how the user is told of the outcome, including final failure."
+        },
+        {
+          "id": "C3",
+          "location": "ambiguous.md: line 3, 'Export a customer's records to a downloadable file'",
+          "scenario": "'Customer's records' is undefined, and so are the file format, size limits, and who is allowed to export which customer. 'The user' is also unclear: it could be an end customer or an internal operator.",
+          "impact": "There is a risk of exporting the wrong or too much data, a possible privacy or authorization gap, and incompatible formats.",
+          "severity": "major",
+          "resolution": "The artifact lists the record types included, the file format, the size limits, and the authorization rule for the requester."
+        },
+        {
+          "id": "C4",
+          "location": "ambiguous.md: line 5, 'download link'",
+          "scenario": "The link's lifetime, access control (public or authenticated), and the retention of the generated file are unspecified.",
+          "impact": "Links may be shared, or may live forever and expose customer data, or may expire before they are used.",
+          "severity": "minor",
+          "resolution": "The artifact states the link expiry, the authentication requirement, and the file retention or deletion policy."
+        }
+      ]
+    },
+    {
+      "role": "adversarial-reviewer",
+      "status": "complete",
+      "coverage": [
+        "contradiction.md",
+        "contract.md"
+      ],
+      "evidence": [
+        {
+          "path": "contradiction.md",
+          "reference": "Export design, full text (single paragraph)"
+        },
+        {
+          "path": "contract.md",
+          "reference": "Existing export API, full text (all three sentences)"
+        }
+      ],
+      "findings": [
+        {
+          "id": "A1",
+          "location": "contradiction.md: Export design, first sentence",
+          "scenario": "Implementers follow the design and call GET /exports/create. The grounding contract says the export API is POST /exports and explicitly says GET /exports/create is not supported.",
+          "impact": "Every export creation call fails because the endpoint does not exist. The feature cannot work as designed.",
+          "severity": "critical",
+          "resolution": "The design names the supported operation, POST /exports, or it cites a contract change that adds GET /exports/create. A reader can match the endpoint and method to the API contract."
+        },
+        {
+          "id": "A2",
+          "location": "contradiction.md: Export design, 'with no request ID'",
+          "scenario": "The design omits the request ID. The contract requires a unique request ID on POST /exports. A client follows the design and sends no ID.",
+          "impact": "The request is likely rejected as invalid. If it is accepted, the server has no key for deduplication, so idempotency is lost.",
+          "severity": "critical",
+          "resolution": "The design states that each logical export generates a unique request ID. It also states where that ID is stored so retries can reuse it."
+        },
+        {
+          "id": "A3",
+          "location": "contradiction.md: Export design, 'Repeat the call after a timeout to ensure export completion'",
+          "scenario": "A call times out after the server has already processed it. The client repeats the call with no request ID, or with a fresh ID each time.",
+          "impact": "Each retry can create another export and another write, producing duplicate exports and side effects. The contract guarantees deduplication only when the same request ID is reused. Repeating a call also does not ensure completion, because the design has no status check, retry limit or backoff.",
+          "severity": "major",
+          "resolution": "The design specifies that retries reuse the original request ID, so the same export is returned and no extra write occurs. It also defines retry limits and backoff, and how the client confirms completion."
+        }
+      ]
+    },
+    {
+      "role": "adversarial-reviewer",
+      "status": "complete",
+      "coverage": [
+        "clean.md",
+        "contract.md"
+      ],
+      "evidence": [
+        {
+          "path": "clean.md",
+          "reference": "Whole proposal, paragraphs 1-2"
+        },
+        {
+          "path": "contract.md",
+          "reference": "Whole contract: POST /exports, unique request ID, idempotent reuse"
+        }
+      ],
+      "findings": [
+        {
+          "id": "A1",
+          "location": "clean.md: paragraph 1, retry behavior",
+          "scenario": "The proposal does not say whether the automatic retries reuse the first attempt's request ID. A storage write might succeed but the response is lost, and the retry then goes out with a freshly generated ID.",
+          "impact": "The contract only deduplicates when a request ID is reused. A new ID per automatic retry could create duplicate exports. The proposal's statement that the API 'supports idempotent writes within one request' leaves this implicit.",
+          "severity": "minor",
+          "resolution": "The proposal states that all automatic attempts within one export request reuse the same request ID. Only a user-initiated retry generates a new ID. An acceptance check covers transient recovery with the ID reused."
+        }
+      ]
+    },
+    {
+      "role": "adjudicator",
+      "status": "complete",
+      "coverage": [
+        "ambiguous.md",
+        "contradiction.md",
+        "contract.md",
+        "cold-reader result C1-C4",
+        "adversarial-reviewer result A1-A3"
+      ],
+      "evidence": [
+        {
+          "path": "ambiguous.md",
+          "reference": "Lines 3 and 5: 'Retry failed exports.', 'Export a customer's records to a downloadable file.', 'receives a download link on success'"
+        },
+        {
+          "path": "contradiction.md",
+          "reference": "Full text: GET /exports/create, no request ID, repeat call after timeout"
+        },
+        {
+          "path": "contract.md",
+          "reference": "All three sentences: POST /exports, unique request ID required, GET /exports/create unsupported, reuse returns same export"
+        }
+      ],
+      "findings": [
+        {
+          "id": "C1",
+          "location": "ambiguous.md: 'Retry failed exports.'",
+          "scenario": "Retry policy is unspecified: which failures, how many attempts, backoff, who triggers, final state.",
+          "impact": "Implementers may retry permanent failures indefinitely or create duplicates, and tests cannot share a standard.",
+          "severity": "major",
+          "resolution": "The artifact specifies retryable failure classes, maximum attempts, backoff, trigger and exhausted state.",
+          "disposition": "accepted",
+          "reason": "Verified. The sole retry statement in ambiguous.md has no policy, so a consequential decision is missing."
+        },
+        {
+          "id": "C2",
+          "location": "ambiguous.md: line 5, 'receives a download link on success'",
+          "scenario": "Only the success path is described. Sync versus async flow, status states and final-failure feedback are undefined.",
+          "impact": "The user may get no feedback and the UI and API contract may diverge.",
+          "severity": "major",
+          "resolution": "The artifact defines the request flow, status states and outcome notification including final failure.",
+          "disposition": "accepted",
+          "reason": "Verified. The text covers success only, and the failure and long-running paths are a consequential gap, which is closely tied to retry behavior."
+        },
+        {
+          "id": "C3",
+          "location": "ambiguous.md: line 3, 'customer's records'",
+          "scenario": "Record scope, format, size limits, requester authorization and the identity of 'the user' are undefined.",
+          "impact": "Wrong or excess data may be exported, with a possible authorization gap.",
+          "severity": "major",
+          "resolution": "The artifact lists record types, format, size limits and the authorization rule.",
+          "disposition": "accepted",
+          "reason": "Verified. Authorization and data scope for customer data are consequential decisions that the artifact leaves out. Format and size limits are lesser details within the same finding."
+        },
+        {
+          "id": "C4",
+          "location": "ambiguous.md: line 5, 'download link'",
+          "scenario": "Link expiry, access control and file retention are unspecified.",
+          "impact": "Links may be shared, live forever or expire early.",
+          "severity": "minor",
+          "resolution": "The artifact states link expiry, authentication requirement and retention policy.",
+          "disposition": "accepted",
+          "reason": "Verified as a real gap. It is localized and secondary to the authorization question in C3, so minor severity is appropriate."
+        },
+        {
+          "id": "A1",
+          "location": "contradiction.md: first sentence",
+          "scenario": "The design calls GET /exports/create, but contract.md says the API is POST /exports and does not support GET /exports/create.",
+          "impact": "Every creation call fails, so the feature cannot work as designed.",
+          "severity": "critical",
+          "resolution": "The design uses POST /exports or cites a contract change adding the endpoint.",
+          "disposition": "accepted",
+          "reason": "Verified directly against contract.md, which states the endpoint is unsupported. This is a fundamental contradiction."
+        },
+        {
+          "id": "A2",
+          "location": "contradiction.md: 'with no request ID'",
+          "scenario": "The design omits the request ID, which contract.md requires to be unique on POST /exports.",
+          "impact": "Requests are likely rejected, or idempotency is lost if they are accepted.",
+          "severity": "critical",
+          "resolution": "The design generates a unique request ID per logical export and states where it is stored for reuse.",
+          "disposition": "accepted",
+          "reason": "Verified. The design directly contradicts the contract's requirement for a request ID. Critical is justified because it is a premise-level contradiction, though it is closely related to A1."
+        },
+        {
+          "id": "A3",
+          "location": "contradiction.md: 'Repeat the call after a timeout to ensure export completion'",
+          "scenario": "A call times out after server processing and is repeated without a request ID or with a fresh one.",
+          "impact": "Duplicate exports and writes occur. Repeating the call does not confirm completion, and the design has no limits or status check.",
+          "severity": "major",
+          "resolution": "Retries reuse the original request ID and the design defines limits, backoff and a completion check.",
+          "disposition": "accepted",
+          "reason": "Verified. The contract guarantees deduplication only for a reused request ID, so the retry instruction as written creates duplicate writes. This is a consequential failure path separate from A1 and A2."
+        }
+      ]
+    }
+  ]
+}
