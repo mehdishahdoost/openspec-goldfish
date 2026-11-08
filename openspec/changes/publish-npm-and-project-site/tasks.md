@@ -27,7 +27,7 @@
 
 ## 5. Public release and deployed integration
 
-- [ ] 5.1 Merge the reviewed release candidate and identify its clean main revision; verify required CI results and repeat package checks on that exact revision before any actual publication.
+- [x] 5.1 Merge the reviewed release candidate and identify its clean main revision; verify required CI results and repeat package checks on that exact revision before any actual publication.
 - [ ] 5.2 Publish the candidate version through the applicable documented bootstrap/OIDC path and create its matching tag/release record; verify registry version/license/source metadata and record the actual authentication mode without credentials.
 - [ ] 5.3 Run the exact published version via npx in temporary environments for all three harnesses and both scopes; verify installed skills, roles, protocol, runtime, and absence of unexpected OpenSpec initialization.
 - [ ] 5.4 Record trusted publisher setup for subsequent releases, including exact workflow identity and first-publish expiry; verify saved settings when configured and explicitly record whether OIDC has actually been exercised, avoiding a synthetic release just for that check.
