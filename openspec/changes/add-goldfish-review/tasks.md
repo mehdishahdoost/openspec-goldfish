@@ -24,8 +24,8 @@
 
 ## 4. Independent review protocol
 
-- [ ] 4.1 Author shared cold-reader instructions and input-packet construction; verify a fixture with an author-only decision exposes missing artifact information and excludes author conversation, repository code, and previous findings from the packet.
-- [ ] 4.2 Author grounded reviewer instructions and evidence collection conventions; verify a seeded planning/repository contradiction produces references to both sources while a clean fixture permits no findings.
+- [x] 4.1 Author shared cold-reader instructions and input-packet construction; verify a fixture with an author-only decision exposes missing artifact information and excludes author conversation, repository code, and previous findings from the packet.
+- [x] 4.2 Author grounded reviewer instructions and evidence collection conventions; verify a seeded planning/repository contradiction produces references to both sources while a clean fixture permits no findings.
 - [x] 4.3 Author adjudicator instructions and coordinator orchestration with bounded role execution; verify fixture runs retain dismissal reasons, canonical duplicate links, unresolved questions, and incomplete/undetermined results on timeout or missing isolation.
 - [x] 4.4 Document review roles, manual invocation, pre-implementation scope, model variability, and unsupported-capability behavior; verify a walkthrough follows the generated skill without an automatic review or implementation step.
 

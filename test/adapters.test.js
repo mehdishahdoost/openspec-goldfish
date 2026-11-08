@@ -46,3 +46,12 @@ test('discovery paths match independently pinned documentation fixtures',async()
   assert.equal(global.root,path.resolve('/tmp/user',fixture.globalRoot));
  }
 });
+test('Codex supports native fresh role messages without pretending labels select TOML agents',async()=>{
+ const {files,skill}=await render({harness:'codex',scope:'local',cwd:'/tmp/project'});
+ const instructions=files[`${skill}/SKILL.md`];
+ assert.match(instructions,/task_name is a label, not an agent selector/);
+ assert.match(instructions,/fork_turns: "none"/);
+ for(const resource of ['protocol/principles.md','protocol/<role>.md','protocol/result-contract.md'])assert.ok(instructions.includes(resource));
+ assert.match(instructions,/Record dispatch as named-agent or fresh-role-message/);
+ assert.match(instructions,/never simulate reviewers/);
+});

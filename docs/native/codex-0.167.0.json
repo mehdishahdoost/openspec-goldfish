@@ -1,0 +1,173 @@
+{
+  "date": "2026-11-08",
+  "harness": "codex",
+  "version": "0.167.0",
+  "dispatch": "fresh-role-message",
+  "fork_turns": "none",
+  "scope": "Native dispatch and reviewer quality; full report/revision workflow not exercised",
+  "receipts": [
+    "/root/cold_reader",
+    "/root/adversarial_contradiction",
+    "/root/adversarial_clean",
+    "/root/adjudicator"
+  ],
+  "results": [
+    {
+      "role": "cold-reader",
+      "status": "complete",
+      "reconstruction": "A user requests an export of a customer's records and receives a download link after success. Failed exports must be retried. The packet supplies no explicit exclusions or acceptance tests. Observable acceptance evidence would include a successful downloadable export and retry behavior after failure. An implementer must invent the export's record selection and file format, plus retry eligibility, limits, and terminal failure behavior.",
+      "coverage": [
+        "ambiguous.md: complete supplied contents"
+      ],
+      "evidence": [
+        {
+          "path": "ambiguous.md",
+          "reference": "Export retry proposal: both body paragraphs"
+        }
+      ],
+      "findings": [
+        {
+          "id": "C1",
+          "location": "ambiguous.md: first body paragraph, \"Retry failed exports.\"",
+          "scenario": "An export repeatedly fails because its input cannot be processed. The proposal does not distinguish retryable failures or specify when retries stop.",
+          "impact": "Implementations may retry indefinitely or stop after an arbitrary number of attempts, producing different resource use and user-visible outcomes.",
+          "severity": "major",
+          "resolution": "Define retry eligibility, a bounded stopping rule, and the observable outcome when retries are exhausted."
+        },
+        {
+          "id": "C2",
+          "location": "ambiguous.md: first body paragraph, \"Export a customer's records to a downloadable file.\"",
+          "scenario": "An implementer must choose which records belong in the export and how to represent them in the file without a specified selection rule or output format.",
+          "impact": "A working download link could deliver incomplete or unusable data while still satisfying the only stated success behavior.",
+          "severity": "major",
+          "resolution": "Specify the included records and file representation sufficiently to verify a representative exported file against an expected result."
+        }
+      ]
+    },
+    {
+      "role": "adversarial-reviewer",
+      "status": "complete",
+      "coverage": [
+        "contradiction.md: Export design",
+        "contract.md: Existing export API"
+      ],
+      "evidence": [
+        {
+          "path": "contradiction.md",
+          "reference": "Export design: endpoint, omitted request ID, and timeout retry"
+        },
+        {
+          "path": "contract.md",
+          "reference": "Existing export API: supported endpoint, required request ID, and idempotent retries"
+        }
+      ],
+      "findings": [
+        {
+          "id": "A1",
+          "location": "contradiction.md: Export design",
+          "scenario": "Export creation follows contradiction.md by calling GET /exports/create without a request ID and repeating that call after a timeout. contract.md specifies POST /exports, requires a unique request ID, and explicitly states that GET /exports/create is unsupported.",
+          "impact": "The planned request cannot create an export through the existing API, and repeating the unsupported request cannot ensure completion. The plan also omits the request ID needed to associate retries with the same export.",
+          "severity": "major",
+          "resolution": "Update the planning contract to use POST /exports with a unique request ID for each logical export and reuse that same ID after a timeout. Acceptance criteria must verify that a timed-out request retried with the same ID returns the same export without another write, as specified in contract.md."
+        }
+      ]
+    },
+    {
+      "role": "adversarial-reviewer",
+      "status": "complete",
+      "coverage": [
+        "clean.md: retry behavior, terminal failures, scope and acceptance checks",
+        "contract.md: existing export API contract"
+      ],
+      "evidence": [
+        {
+          "path": "clean.md",
+          "reference": "Export retry proposal: attempt limits, delay, user retry behavior, authorization failures and acceptance checks"
+        },
+        {
+          "path": "contract.md",
+          "reference": "Existing export API: POST /exports, unique request IDs and idempotent reuse"
+        }
+      ],
+      "findings": []
+    },
+    {
+      "role": "adjudicator",
+      "status": "complete",
+      "coverage": [
+        "protocol/principles.md: complete supplied contents",
+        "protocol/adjudicator.md: complete supplied contents",
+        "protocol/result-contract.md: complete supplied contents",
+        "ambiguous.md: complete supplied contents",
+        "contradiction.md: complete supplied contents",
+        "contract.md: complete supplied contents",
+        "Actual cold-reader result: C1 and C2",
+        "Actual adversarial-reviewer result: A1"
+      ],
+      "evidence": [
+        {
+          "path": "protocol/principles.md",
+          "reference": "Evidence requirements, independent review, and prohibition on artifact edits"
+        },
+        {
+          "path": "protocol/adjudicator.md",
+          "reference": "Disposition requirements and severity definitions"
+        },
+        {
+          "path": "protocol/result-contract.md",
+          "reference": "Adjudicator fields and retention of every original finding ID"
+        },
+        {
+          "path": "ambiguous.md",
+          "reference": "Export retry proposal: both body paragraphs"
+        },
+        {
+          "path": "contradiction.md",
+          "reference": "Export design: unsupported GET endpoint, omitted request ID, and timeout retry"
+        },
+        {
+          "path": "contract.md",
+          "reference": "Existing export API: POST endpoint, required request ID, and idempotent reuse"
+        }
+      ],
+      "findings": [
+        {
+          "id": "C1",
+          "location": "ambiguous.md: first body paragraph, \"Retry failed exports.\"",
+          "scenario": "An export repeatedly fails because its input cannot be processed. The proposal does not distinguish retryable failures or specify when retries stop.",
+          "impact": "Implementations may retry indefinitely or stop after an arbitrary number of attempts, producing different resource use and user-visible outcomes.",
+          "severity": "major",
+          "resolution": "Define retry eligibility, a bounded stopping rule, and the observable outcome when retries are exhausted.",
+          "disposition": "accepted",
+          "reason": "ambiguous.md requires retries without defining eligibility, limits, or exhausted-retry behavior. contradiction.md specifies only a timeout retry, and contract.md specifies request deduplication; neither supplies these missing decisions. This is a consequential failure-path gap."
+        },
+        {
+          "id": "C2",
+          "location": "ambiguous.md: first body paragraph, \"Export a customer's records to a downloadable file.\"",
+          "scenario": "An implementer must choose which records belong in the export and how to represent them in the file without a specified selection rule or output format.",
+          "impact": "A working download link could deliver incomplete or unusable data while still satisfying the only stated success behavior.",
+          "severity": "major",
+          "resolution": "Specify the included records and file representation sufficiently to verify a representative exported file against an expected result.",
+          "disposition": "accepted",
+          "reason": "ambiguous.md identifies the customer and downloadable delivery but provides no verifiable record-selection rule or file representation. Neither contradiction.md nor contract.md defines export contents. These decisions determine whether the exported data satisfies the intended behavior."
+        },
+        {
+          "id": "A1",
+          "location": "contradiction.md: Export design",
+          "scenario": "Export creation follows contradiction.md by calling GET /exports/create without a request ID and repeating that call after a timeout. contract.md specifies POST /exports, requires a unique request ID, and explicitly states that GET /exports/create is unsupported.",
+          "impact": "The planned request cannot create an export through the existing API, and repeating the unsupported request cannot ensure completion. The plan also omits the request ID needed to associate retries with the same export.",
+          "severity": "critical",
+          "resolution": "Update the planning contract to use POST /exports with a unique request ID for each logical export and reuse that same ID after a timeout. Acceptance criteria must verify that a timed-out request retried with the same ID returns the same export without another write, as specified in contract.md.",
+          "disposition": "accepted",
+          "reason": "contradiction.md directly conflicts with contract.md on both the supported endpoint and mandatory request ID. The planned creation mechanism is infeasible under the supplied API contract. Severity is critical under protocol/adjudicator.md's definition of a fundamental contradiction or infeasible premise."
+        }
+      ]
+    }
+  ],
+  "artifactHashes": {
+    "clean.md": "5e692866fbd62868d1759881cbe69c69772a1fa647eabd0355958941499dc10e",
+    "ambiguous.md": "08b43738efc78bcf6a1a033572fc025a42b20920ba921d5ae48b925110cd4da9",
+    "contradiction.md": "a48a5389fe79ed8f06e41f5a5d01177ca981b3ae4f25a00167f52dcfbbf6f774",
+    "contract.md": "79c52d14f5fb87e27af585a0879bbf84352a0af21e9ac9ca945e121598378337"
+  }
+}

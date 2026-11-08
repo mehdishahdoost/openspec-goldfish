@@ -48,3 +48,9 @@ On 2026-11-08, all three CLIs were retried in a fresh temporary workspace with c
 - Devin authenticated successfully. Its first attempt rejected a tool requiring confirmation in noninteractive mode. With explicit `--permission-mode auto`, it read the skill and fixtures, but all three native `goldfish-*` profile launches failed before starting. Further inspection also required confirmation unavailable in print mode. No reviewer findings were returned, so quality checks did not pass.
 
 Tasks 4.1, 4.2, and 6.2 remain pending until actual independent reviewer results and the full workflow are observed. Codex needs an adapter compatibility decision or a runtime exposing native custom-agent selection; lifting filesystem restrictions alone does not resolve that limitation.
+
+## Codex dispatch fix verified
+
+Codex CLI 0.167.0 completed four fresh native role-message subagents: cold reader, contradiction reviewer, clean reviewer and adjudicator. Parent history was excluded with `fork_turns: "none"`. The cold reader identified missing retry bounds without receiving the hidden author decision; the contradiction reviewer cited both planning and API contract; the clean reviewer returned no findings. The adjudicator retained C1, C2 and A1 with reasoned dispositions. Fixture hashes remained unchanged. Actual returned JSON and dispatch receipts are retained in [native evidence](native/codex-0.167.0.json).
+
+The adapter now chooses named dispatch only where the native schema exposes a selector; otherwise it supplies the canonical role instructions in a fresh native agent message and records that mode. This verifies tasks 4.1 and 4.2. Task 6.2 remains open: full report persistence, accepted native revisions and all three harnesses have not been verified end to end.

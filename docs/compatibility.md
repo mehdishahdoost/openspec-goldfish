@@ -25,3 +25,7 @@ Run `npm test` for installation, protocol-helper and packaging fixtures. Native 
 Devin imports Claude skills too. When both adapters are installed, use `/devin:openspec-goldfish` to select the native Devin workflow; an unqualified name can select the Claude provider. `devin skills show devin:openspec-goldfish` confirms the intended provider.
 
 See [acceptance record](acceptance.md) for native loading results, blocked model smoke checks, and remaining verification steps.
+
+### Codex dispatch capability
+
+Inspect the exposed spawn schema. If it supports custom-agent selection, use the installed TOML definitions. Otherwise, when native spawning explicitly supports excluding parent history, send the canonical principles, role instructions, result contract and bounded input as the initial message of a fresh native subagent (`fork_turns: "none"`). A task label does not select a TOML definition. Record the actual dispatch mode in coverage. No model overrides are needed; the parent model and permissions are inherited. If fresh execution cannot be established, report incomplete. This mode does not promise that TOML-specific settings were applied.

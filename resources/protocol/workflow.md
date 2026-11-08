@@ -11,9 +11,9 @@
 
 ## Independent review
 
-5. Read result-contract.md. Start fresh native goldfish-cold-reader and goldfish-adversarial-reviewer agents, concurrently if capacity permits or serially with separate contexts. Do not fork author history. Supply the result contract in their invocation. Use the installed role definitions; do not let them edit.
+5. Read result-contract.md. Start fresh native goldfish-cold-reader and goldfish-adversarial-reviewer agents, concurrently if capacity permits or serially with separate contexts. Do not fork author history. Supply the result contract in their invocation. Use the installed role definitions according to the harness adapter. Where the adapter explicitly supports fresh role messages, include the literal shared principles, role instructions and result contract in a native fresh subagent message. Do not let reviewers edit.
 6. Give the cold reader only the literal cold-packet.json contents and contract, not its parent directory or repository instructions to explore. It must reconstruct intent before findings. Give the grounded reviewer the planning packet, target repository location and explicit constraints, allowing read-only existing spec/code exploration. Do not share either reviewer's output with the other.
-7. Allow at most ten minutes per role from spawn. Use host wait/cancel controls; on expiration cancel if possible and record failed with the timeout reason. Record failed for unavailable agents, inherited author history, tool denial, or malformed output. No automatic retry, coordinator replacement critique, or silent downgrade.
+7. Allow at most ten minutes per role from spawn. Use host wait/cancel controls; on expiration cancel if possible and record failed with the timeout reason. Record failed for unavailable supported dispatch modes, inherited author history, tool denial, or malformed output. No automatic retry, coordinator replacement critique, or silent downgrade.
 8. If both reviewers succeed, start a fresh goldfish-adjudicator with both results, planning packet, contract, and repository evidence access. Only this role may receive earlier report history to correlate resolved findings. If a reviewer failed, mark adjudication failed because required coverage is missing; retain available raw findings. Apply the same time budget to adjudication.
 
 ## Report
