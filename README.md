@@ -22,17 +22,13 @@ A misunderstanding is a candidate finding, not proof of a defect. The adjudicato
 
 ## Install
 
-Requires Node.js 22+ and a supported coding harness. Review also requires OpenSpec with resolved artifact metadata. This package is in development and has not been published to npm.
-
-From this checkout:
+Requires Node.js 22+ and a supported coding harness. Review also requires OpenSpec with resolved artifact metadata. Install the MIT-licensed package from npm:
 
 ```bash
-node bin/openspec-goldfish.js --harness claude --local
-node bin/openspec-goldfish.js --harness codex --global
-node bin/openspec-goldfish.js --harness devin --local
+npx openspec-goldfish
 ```
 
-After publication, the equivalent installation will be:
+Or specify a harness and scope explicitly:
 
 ```bash
 npx openspec-goldfish --harness claude --local
@@ -40,7 +36,9 @@ npx openspec-goldfish --harness codex --global
 npx openspec-goldfish --harness devin --local
 ```
 
-After publication, `npx openspec-goldfish` alone opens the interactive installer. Omit selections to choose interactively. The scope prompt defaults to the current project. In scripts, specify a harness and exactly one of `--local` or `--global`. Installation does not require or initialize an OpenSpec project.
+For development, clone this repository and run `node bin/openspec-goldfish.js` with the same options.
+
+Omit selections to choose interactively. The scope prompt defaults to the current project. In scripts, specify a harness and exactly one of `--local` or `--global`. Installation does not require or initialize an OpenSpec project.
 
 ## Review
 
@@ -130,6 +128,6 @@ Inspired by the independent critique approach in [openspec-adversarial-multi-age
 
 ## Project and license
 
-[Website](https://mehdishahdoost.github.io/openspec-goldfish/) · [npm](https://www.npmjs.com/package/openspec-goldfish) · [Release guide](docs/releasing.md)
+[Website](https://shahdoost.nl/openspec-goldfish/) · [npm](https://www.npmjs.com/package/openspec-goldfish) · [Release guide](docs/releasing.md)
 
 Released under the [MIT License](LICENSE).
