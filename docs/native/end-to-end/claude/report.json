@@ -1,0 +1,487 @@
+{
+  "runId": "2a83a8be-c88b-424a-9238-ddb736b0c7e8",
+  "change": "sample",
+  "harness": "claude",
+  "harnessVersion": "2.1.319",
+  "packageVersion": "0.1.0",
+  "protocolVersion": 1,
+  "inputFingerprint": "4564612544e417b669369428548ba748a0347ea60bdc553ce6bcbbe433dea3c4",
+  "createdAt": "2026-11-08T22:23:47.169Z",
+  "completion": "complete",
+  "readiness": "revise",
+  "freshness": "current",
+  "coverageLimits": [],
+  "roleResults": {
+    "cold-reader": {
+      "role": "cold-reader",
+      "status": "complete",
+      "reconstruction": "Intended behavior: a customer requests a record export. The system calls GET /exports/create with no request ID, using the existing export API (proposal.md Impact; spec.md Requirement 'Create export'). The export is a JSON document with customer ID and display name fields (design.md, sole paragraph), covering the authenticated customer profile (spec.md). Access is restricted to the requesting customer. On success, the synchronous response returns a download link for that customer's profile (spec.md Scenario 'Request succeeds'; design.md). Links expire after one hour, and the underlying files are deleted at expiry (design.md). Failure handling: timeouts are retried twice with one second between attempts; after the retries are exhausted, the user sees a terminal failure with a retry button. Authentication failures are terminal (design.md). A user retry creates a new logical request (design.md). In scope: export creation, bounded retry, terminal failure, and user retry (proposal.md What Changes; tasks.md 1.1). Acceptance evidence named in tasks.md 1.1: authenticated success, retries, terminal failure, and user retry. The only spec scenario is the success path (spec.md). Decisions an implementer must invent: the per-attempt timeout duration; whether 'twice' means two total attempts or two retries after an initial attempt; which failures count as timeouts (only timeouts, or also 5xx and network errors); the error message text and whether the auth-failure state also shows the retry button; the exact field list of the 'customer profile' versus the two fields named in design.md; how an expired link is answered; and how duplicate server-side exports from automatic retries are handled, given that no request ID is sent.",
+      "coverage": [
+        "design.md",
+        "proposal.md",
+        "specs/export/spec.md",
+        "tasks.md"
+      ],
+      "evidence": [
+        {
+          "path": "design.md",
+          "reference": "Whole document (single paragraph, no section headings)"
+        },
+        {
+          "path": "proposal.md",
+          "reference": "Why; What Changes; Capabilities; Impact sections"
+        },
+        {
+          "path": "specs/export/spec.md",
+          "reference": "Purpose; ADDED Requirements 'Create export'; Scenario 'Request succeeds'"
+        },
+        {
+          "path": "tasks.md",
+          "reference": "Section 1 'Export', task 1.1"
+        }
+      ],
+      "findings": [
+        {
+          "id": "C1",
+          "location": "specs/export/spec.md: ADDED Requirements and Scenario 'Request succeeds'; tasks.md: 1.1",
+          "scenario": "tasks.md 1.1 requires verifying authenticated success, retries, terminal failure, and user retry, and design.md defines the auth-failure, expiry, and access-restriction behavior. The spec contains only one requirement and one success scenario.",
+          "impact": "Retry, terminal-failure, auth-failure, expiry, and access-restriction behavior have no normative requirement or testable scenario, so acceptance of those behaviors cannot be checked against the spec.",
+          "severity": "major",
+          "resolution": "spec.md contains a requirement and at least one WHEN/THEN scenario each for bounded retry, terminal failure with retry button, authentication failure, user retry creating a new request, one-hour link expiry with file deletion, and requesting-customer-only access."
+        },
+        {
+          "id": "C2",
+          "location": "design.md: retry paragraph ('Retry timeouts twice with one second between attempts')",
+          "scenario": "An implementer reads 'retry twice' and must choose between two total attempts and three total attempts (one initial plus two retries). The per-attempt timeout duration is also unspecified.",
+          "impact": "Different implementations will make a different number of calls and wait different durations before failing. Retry tests cannot assert a single correct attempt count or timing.",
+          "severity": "major",
+          "resolution": "design.md states the total attempt count, the per-attempt timeout duration, and the delay schedule."
+        },
+        {
+          "id": "C3",
+          "location": "design.md: 'Retry timeouts twice' and 'Authentication failures are terminal'",
+          "scenario": "A failure other than a timeout or authentication failure occurs, such as a 5xx response, a network reset, or a malformed response. The design does not say whether it is retried, treated as terminal, or handled differently.",
+          "impact": "Implementers will classify error types differently, so retry behavior and terminal-failure display will vary across implementations.",
+          "severity": "major",
+          "resolution": "design.md lists every error class that is retried, every class that is terminal, and the handling for any unlisted class."
+        },
+        {
+          "id": "C4",
+          "location": "design.md: 'Retry timeouts twice' combined with 'User retry creates a new logical request' and 'no request ID'",
+          "scenario": "The system performs an automatic retry after a timeout where the first attempt actually created an export on the server. Because GET /exports/create carries no request ID, the retry has no way to identify the original request.",
+          "impact": "Duplicate exports may be created for one user action. The design does not say whether duplicates are acceptable, whether the server deduplicates, or whether only the first created link is returned.",
+          "severity": "major",
+          "resolution": "design.md states the duplicate-export policy for automatic retries and whether the user sees one link or several."
+        },
+        {
+          "id": "C5",
+          "location": "specs/export/spec.md: 'Create export' ('a JSON export of the authenticated customer profile') versus design.md ('JSON fields are customer ID and display name')",
+          "scenario": "The spec describes the full authenticated customer profile, while the design lists only two fields. An implementer cannot tell whether the export must contain every profile field or only customer ID and display name.",
+          "impact": "The export payload may over-include personal data or omit fields that acceptance tests expect.",
+          "severity": "major",
+          "resolution": "spec.md or design.md enumerates the exact JSON fields included in the export, and the spec and design agree on that list."
+        },
+        {
+          "id": "C6",
+          "location": "design.md: 'links expire after one hour and files are deleted then'",
+          "scenario": "A customer opens a download link after one hour has passed. The design does not say what status or message the link returns, nor whether deletion is immediate at expiry or is a later cleanup job.",
+          "impact": "Expiry and deletion behavior cannot be tested precisely, and the client will not know whether to offer a new export.",
+          "severity": "minor",
+          "resolution": "design.md or spec.md defines the response for expired links and whether deletion occurs at exactly one hour or within a stated grace period."
+        },
+        {
+          "id": "C7",
+          "location": "design.md: 'GET /exports/create' versus proposal.md 'Use existing export API' and spec.md 'through the existing export API'",
+          "scenario": "The design specifies a GET request that creates a resource. The packet does not confirm that the existing export API exposes this endpoint or method, so the design's endpoint may conflict with the existing API.",
+          "impact": "If the existing API uses a different method or path, the implementer must choose between the design and the existing API, and the chosen behavior may not match what the proposal promises.",
+          "severity": "minor",
+          "resolution": "design.md confirms that GET /exports/create is the existing export API endpoint and method, or it names the correct endpoint and method."
+        }
+      ]
+    },
+    "adversarial-reviewer": {
+      "role": "adversarial-reviewer",
+      "status": "complete",
+      "reconstruction": "",
+      "coverage": [
+        "proposal.md and design.md",
+        "specs/export/spec.md",
+        "tasks.md",
+        "contract.md"
+      ],
+      "evidence": [
+        {
+          "path": "/tmp/goldfish-e2e-claude/openspec/changes/sample/proposal.md",
+          "reference": "whole file (Why, What Changes, Impact)"
+        },
+        {
+          "path": "/tmp/goldfish-e2e-claude/openspec/changes/sample/design.md",
+          "reference": "whole file (single paragraph, line 3)"
+        },
+        {
+          "path": "/tmp/goldfish-e2e-claude/openspec/changes/sample/specs/export/spec.md",
+          "reference": "whole file (Requirement: Create export, Scenario: Request succeeds)"
+        },
+        {
+          "path": "/tmp/goldfish-e2e-claude/openspec/changes/sample/tasks.md",
+          "reference": "whole file (1.1)"
+        },
+        {
+          "path": "/tmp/goldfish-e2e-claude/contract.md",
+          "reference": "whole file (line 2)"
+        }
+      ],
+      "findings": [
+        {
+          "id": "A1",
+          "location": "design.md: Use GET /exports/create with no request ID; contract.md line 2",
+          "scenario": "Implementation follows design.md and issues GET /exports/create. The existing API contract states POST /exports creates an export and GET /exports/create is unsupported.",
+          "impact": "Every export request fails against the existing API, so the core capability cannot work. The design's stated endpoint and method are inconsistent with the repository's documented contract.",
+          "severity": "critical",
+          "resolution": "design.md names the method and path that contract.md documents as supported (POST /exports), or the planning packet cites an authoritative source showing the contract has changed and contract.md is updated. The spec and tasks reference the same endpoint."
+        },
+        {
+          "id": "A2",
+          "location": "design.md: Use GET /exports/create with no request ID; Failure handling retry sentence; contract.md line 2",
+          "scenario": "A timeout occurs and the client retries twice. Because design.md specifies no request ID, each attempt is sent as a new logical request. The contract requires a unique request ID per logical request, reused on timeout retries, to avoid duplicate writes.",
+          "impact": "Timeout retries can create duplicate export writes. The retry policy is unsafe under the documented contract.",
+          "severity": "major",
+          "resolution": "design.md specifies that a request ID is generated once per logical request, reused across timeout retries, and regenerated only for user retry. The spec or design states this, and tasks.md 1.1 verifies that retries reuse the same ID."
+        },
+        {
+          "id": "A3",
+          "location": "design.md: Synchronous response returns the link on success; specs/export/spec.md: Scenario Request succeeds",
+          "scenario": "Design says the response is synchronous and returns the link, while the contract only documents POST /exports creating an export with no response shape. The spec's success scenario only says a link is returned, with no stated status or sync/async behaviour.",
+          "impact": "Implementers may assume an asynchronous job model and poll, or a synchronous link and not handle the 'in progress' case. Timeout and retry behaviour depends on which model holds, so the retry rules in design.md are not well defined.",
+          "severity": "minor",
+          "resolution": "The spec states the response model (synchronous or not) and the success and timeout response shape, cross-referenced to the existing export API contract."
+        },
+        {
+          "id": "A4",
+          "location": "specs/export/spec.md: ADDED Requirements (only 'Create export' with one success scenario); tasks.md 1.1",
+          "scenario": "tasks.md 1.1 requires verifying authenticated success, retries, terminal failure, and user retry. design.md also defines authentication failures as terminal, a retry button after terminal failure, one-hour link expiry with file deletion, and access restricted to the requesting customer. specs/export/spec.md has only a success scenario.",
+          "impact": "The behaviours verified by tasks.md and specified in design.md have no normative requirement or scenario in the spec. Retry, terminal failure, authentication failure, expiry, deletion and access control can be implemented or tested inconsistently, and there is no spec basis to verify them.",
+          "severity": "major",
+          "resolution": "specs/export/spec.md contains requirements and scenarios for: timeout retry count and interval; terminal failure and retry affordance; user retry as a new logical request; authentication failure as terminal; link expiry of one hour with file deletion; and access restricted to the requesting customer. Each has a scenario that tasks.md 1.1 can verify."
+        },
+        {
+          "id": "A5",
+          "location": "design.md: JSON fields are customer ID and display name; specs/export/spec.md: Requirement Create export ('customer profile')",
+          "scenario": "design.md limits the JSON export to customer ID and display name. The spec says the export contains the 'authenticated customer profile', which does not specify fields.",
+          "impact": "The spec permits exporting the full profile, which may include fields beyond ID and display name. Implementation and review could disagree on the export contents, with privacy consequences for customer data.",
+          "severity": "minor",
+          "resolution": "specs/export/spec.md lists the exact exported fields (customer ID and display name) consistently with design.md, or design.md and the spec both reference the same field definition."
+        }
+      ]
+    },
+    "adjudicator": {
+      "role": "adjudicator",
+      "status": "complete",
+      "reconstruction": "Intended behavior: a customer requests a JSON record export through the existing export API (proposal.md Impact). The design calls GET /exports/create with no request ID (design.md line 3), but the repository contract documents POST /exports as the creating endpoint, with GET /exports/create unsupported, and requires a unique request ID per logical request, reused on timeout retries (contract.md line 2). On success the synchronous response returns a download link (design.md line 3; spec.md Scenario 'Request succeeds'). Timeouts are retried twice with one-second spacing, then a terminal failure with a retry button is shown; authentication failures are terminal; a user retry is a new logical request (design.md line 3). Links expire after one hour and files are deleted at that point; access is limited to the requesting customer (design.md line 3). The spec contains only one requirement and one success scenario (spec.md lines 8-13), while tasks.md 1.1 requires verifying authenticated success, retries, terminal failure, and user retry (tasks.md line 4). Reviewer 2 returned an empty reconstruction; this adjudicator reconstructs the intended behavior from the artifacts directly.",
+      "coverage": [
+        "proposal.md",
+        "design.md",
+        "specs/export/spec.md",
+        "tasks.md",
+        "contract.md",
+        "reviewer result 1 (cold-reader) findings C1-C7",
+        "reviewer result 2 (adversarial-reviewer) findings A1-A5"
+      ],
+      "evidence": [
+        {
+          "path": "/tmp/goldfish-e2e-claude/openspec/changes/sample/proposal.md",
+          "reference": "Why (line 4); What Changes (line 7); Capabilities (lines 9-11); Impact (line 14: 'Use existing export API.')"
+        },
+        {
+          "path": "/tmp/goldfish-e2e-claude/openspec/changes/sample/design.md",
+          "reference": "Line 3, single paragraph: GET /exports/create with no request ID; retry timeouts twice with one second between attempts; terminal failure and retry button; user retry is a new logical request; authentication failures are terminal; JSON fields are customer ID and display name; access restricted to requesting customer; links expire after one hour and files deleted then; synchronous response returns link"
+        },
+        {
+          "path": "/tmp/goldfish-e2e-claude/openspec/changes/sample/specs/export/spec.md",
+          "reference": "Purpose (lines 3-4); Requirement 'Create export' (lines 8-9); Scenario 'Request succeeds' (lines 11-13)"
+        },
+        {
+          "path": "/tmp/goldfish-e2e-claude/openspec/changes/sample/tasks.md",
+          "reference": "Section 1 Export, task 1.1 (line 4)"
+        },
+        {
+          "path": "/tmp/goldfish-e2e-claude/contract.md",
+          "reference": "Line 2: 'POST /exports creates an export. GET /exports/create is unsupported. A unique request ID is required per logical request and must be reused on timeout retries to avoid duplicate writes. A user retry is a new request with a new ID.'"
+        }
+      ],
+      "findings": [
+        {
+          "id": "C1",
+          "location": "specs/export/spec.md: ADDED Requirements and Scenario 'Request succeeds'; tasks.md: 1.1",
+          "scenario": "tasks.md 1.1 requires verifying authenticated success, retries, terminal failure, and user retry, and design.md line 3 defines auth-failure, expiry, and access-restriction behavior. The spec has one requirement and one success scenario (spec.md lines 8-13).",
+          "impact": "Retry, terminal-failure, auth-failure, expiry, and access-restriction behavior have no normative requirement or testable scenario, so acceptance cannot be checked against the spec.",
+          "severity": "major",
+          "resolution": "spec.md contains a requirement and at least one WHEN/THEN scenario each for bounded retry, terminal failure with retry button, authentication failure, user retry creating a new request, one-hour link expiry with file deletion, and requesting-customer-only access.",
+          "disposition": "accepted",
+          "reason": "Verified: spec.md lines 8-13 contain only the success path, while design.md line 3 and tasks.md line 4 require the other behaviors. This canonical finding also absorbs A4, which has the same evidence and resolution."
+        },
+        {
+          "id": "C2",
+          "location": "design.md line 3: 'Retry timeouts twice with one second between attempts'",
+          "scenario": "An implementer cannot tell whether 'twice' means two total attempts or one initial attempt plus two retries. The per-attempt timeout duration is not stated anywhere in the packet.",
+          "impact": "Implementations will make different numbers of calls and wait different durations before failing, so retry tests cannot assert one correct attempt count or timing.",
+          "severity": "major",
+          "resolution": "design.md states the total attempt count, the per-attempt timeout duration, and the delay schedule.",
+          "disposition": "accepted",
+          "reason": "Verified: design.md line 3 says 'twice' with no attempt-count or timeout definition, and no other packet file defines them. This is a consequential missing decision."
+        },
+        {
+          "id": "C3",
+          "location": "design.md line 3: 'Retry timeouts twice' and 'Authentication failures are terminal'",
+          "scenario": "A failure that is neither a timeout nor an authentication failure, such as a 5xx response, a network reset, or a malformed response, occurs. design.md line 3 does not say whether it is retried or terminal.",
+          "impact": "Implementers will classify errors differently, so retry behavior and terminal-failure display will vary.",
+          "severity": "major",
+          "resolution": "design.md lists every error class that is retried, every class that is terminal, and the handling for any unlisted class.",
+          "disposition": "accepted",
+          "reason": "Verified: design.md line 3 names only timeouts (retried) and authentication failures (terminal). Unlisted classes are unaddressed, which is a consequential missing failure path. It is distinct from J1, which concerns the display of the auth-failure state."
+        },
+        {
+          "id": "C4",
+          "location": "design.md line 3 ('Retry timeouts twice' with 'User retry creates a new logical request'); contract.md line 2",
+          "scenario": "A timeout occurs after the first attempt has already created an export on the server. Because no request ID is sent, the automatic retry cannot be tied to the original request.",
+          "impact": "Duplicate server-side exports can result from one user action. The design does not state whether duplicates are acceptable or whether the user sees one link or several.",
+          "severity": "major",
+          "resolution": "design.md states the duplicate-export policy for automatic retries and whether the user sees one link or several.",
+          "disposition": "duplicate",
+          "duplicateOf": "A2",
+          "reason": "Same root cause as A2: design.md line 3 omits the request ID, and contract.md line 2 requires one per logical request reused on timeout retries to avoid duplicate writes. A2 is canonical because it is grounded in the repository contract. Residual: A2's resolution should also state whether the user sees one link or several, which C4 raised."
+        },
+        {
+          "id": "C5",
+          "location": "specs/export/spec.md line 9 ('JSON export of the authenticated customer profile') versus design.md line 3 ('JSON fields are customer ID and display name')",
+          "scenario": "The spec describes the full authenticated customer profile, while the design lists two fields. An implementer cannot tell whether the export must contain every profile field or only these two.",
+          "impact": "The export payload may over-include personal data or omit fields that acceptance tests expect.",
+          "severity": "major",
+          "resolution": "spec.md or design.md enumerates the exact JSON fields included in the export, and the spec and design agree on that list.",
+          "disposition": "accepted",
+          "reason": "Verified: spec.md line 9 and design.md line 3 disagree on the scope of the payload. The payload is the primary deliverable and carries personal-data exposure risk, so major is kept. A5 reports the same conflict at minor severity; C5 is canonical."
+        },
+        {
+          "id": "C6",
+          "location": "design.md line 3: 'links expire after one hour and files are deleted then'",
+          "scenario": "A customer opens a link after one hour. The packet does not define the response for an expired link, or whether deletion happens exactly at expiry or in a later cleanup job.",
+          "impact": "Expiry behavior cannot be tested precisely, and the client does not know whether to offer a new export.",
+          "severity": "minor",
+          "resolution": "design.md or spec.md defines the response for expired links and whether deletion occurs at exactly one hour or within a stated grace period.",
+          "disposition": "accepted",
+          "reason": "Verified: design.md line 3 gives the one-hour expiry and deletion timing but not the expired-link response. This is a localized gap that does not change the core design, so it is minor and non-blocking."
+        },
+        {
+          "id": "C7",
+          "location": "design.md line 3 ('GET /exports/create') versus proposal.md line 14 ('Use existing export API') and spec.md line 9",
+          "scenario": "The design specifies a GET request that creates a resource. The reviewer states the packet does not confirm the existing API's endpoint or method.",
+          "impact": "If the existing API uses a different method or path, the implementer must choose between the design and the existing API.",
+          "severity": "minor",
+          "resolution": "design.md confirms that GET /exports/create is the existing export API endpoint and method, or it names the correct endpoint and method.",
+          "disposition": "duplicate",
+          "duplicateOf": "A1",
+          "reason": "A1 is canonical. contract.md line 2 is repository evidence that POST /exports creates exports and GET /exports/create is unsupported, which resolves C7's open question and raises its severity through A1. C7's minor severity is not retained."
+        },
+        {
+          "id": "A1",
+          "location": "design.md line 3: 'Use GET /exports/create with no request ID'; /tmp/goldfish-e2e-claude/contract.md line 2",
+          "scenario": "Implementation follows design.md and issues GET /exports/create. contract.md line 2 states that GET /exports/create is unsupported and that POST /exports creates an export.",
+          "impact": "Every export request fails against the existing API, so the core capability cannot work. The planning premise conflicts with the documented contract.",
+          "severity": "critical",
+          "resolution": "design.md names the method and path that contract.md documents as supported (POST /exports), or the packet cites an authoritative source showing the contract has changed and contract.md is updated. The spec and tasks reference the same endpoint.",
+          "disposition": "accepted",
+          "reason": "Verified: design.md line 3 specifies GET /exports/create, and contract.md line 2 says GET /exports/create is unsupported. This is an infeasible premise, so critical is supported. C7 is folded into this finding."
+        },
+        {
+          "id": "A2",
+          "location": "design.md line 3 ('no request ID' and 'Retry timeouts twice'); /tmp/goldfish-e2e-claude/contract.md line 2",
+          "scenario": "A timeout occurs and the design retries. Because design.md sends no request ID, each attempt is a new logical request. contract.md line 2 requires a unique request ID per logical request, reused on timeout retries.",
+          "impact": "Timeout retries can create duplicate writes, which the contract is designed to prevent. The retry policy is unsafe under the documented contract.",
+          "severity": "major",
+          "resolution": "design.md specifies that a request ID is generated once per logical request, reused across timeout retries, and regenerated only for user retry. The spec or design states this, and tasks.md 1.1 verifies that retries reuse the same ID.",
+          "disposition": "accepted",
+          "reason": "Verified: contract.md line 2 requires request-ID reuse on timeout retries and a new ID for user retry, and design.md line 3 specifies neither. This is a consequential contract violation in the failure path. It is canonical for C4."
+        },
+        {
+          "id": "A3",
+          "location": "design.md line 3 ('Synchronous response returns the link on success'); specs/export/spec.md lines 11-13",
+          "scenario": "The reviewer says the response model is unclear, because the contract does not document a response shape and the spec's success scenario states no sync or async behavior.",
+          "impact": "Claimed: implementers may assume an asynchronous job model and poll, or may not handle an in-progress state.",
+          "severity": "minor",
+          "resolution": "The spec states the response model (synchronous or not) and the success and timeout response shape, cross-referenced to the existing export API contract.",
+          "disposition": "dismissed",
+          "reason": "Already covered in part: design.md line 3 states that the response is synchronous and returns the link on success, so the sync model is decided. The remaining gap, the response shape on timeout, is already captured by C2 and C3 (timeout and failure-path definition). contract.md line 2 documents no response shape, so the cross-reference cannot be satisfied by the repository alone, but that is not a separate blocking defect."
+        },
+        {
+          "id": "A4",
+          "location": "specs/export/spec.md lines 8-13; tasks.md line 4",
+          "scenario": "tasks.md 1.1 requires verifying retries, terminal failure, and user retry, and design.md line 3 defines auth failure, retry affordance, expiry, and access control. The spec has only a success scenario.",
+          "impact": "The verified and designed behaviors have no normative requirement or scenario, so they can be implemented or tested inconsistently.",
+          "severity": "major",
+          "resolution": "specs/export/spec.md contains requirements and scenarios for timeout retry count and interval; terminal failure and retry affordance; user retry as a new logical request; authentication failure as terminal; link expiry of one hour with file deletion; and access restricted to the requesting customer.",
+          "disposition": "duplicate",
+          "duplicateOf": "C1",
+          "reason": "Same evidence and same resolution as C1 (spec.md lines 8-13 versus tasks.md line 4 and design.md line 3). C1 is canonical. A4 adds no unique requirement beyond C1's resolution."
+        },
+        {
+          "id": "A5",
+          "location": "design.md line 3 ('JSON fields are customer ID and display name'); specs/export/spec.md line 9 ('customer profile')",
+          "scenario": "design.md limits the JSON export to customer ID and display name, while the spec says the export contains the authenticated customer profile without enumerating fields.",
+          "impact": "The spec permits exporting the full profile, which could include fields beyond ID and display name, with privacy consequences.",
+          "severity": "minor",
+          "resolution": "specs/export/spec.md lists the exact exported fields consistently with design.md, or design.md and the spec both reference the same field definition.",
+          "disposition": "duplicate",
+          "duplicateOf": "C5",
+          "reason": "Same conflict as C5 (spec.md line 9 versus design.md line 3). C5 is canonical and carries the major severity because the payload scope affects personal data. A5's minor severity is not retained."
+        },
+        {
+          "id": "J1",
+          "location": "design.md line 3 ('show a terminal failure and a retry button' and 'Authentication failures are terminal')",
+          "scenario": "Design line 3 says the retry button appears after timeout exhaustion, and separately that authentication failures are terminal. It does not say whether the authentication-failure state shows the retry button or what error message text is displayed.",
+          "impact": "Two implementers could render the auth-failure state differently, with or without a retry button and with different messages. The effect is localized to UI state.",
+          "severity": "minor",
+          "resolution": "design.md states whether the authentication-failure terminal state shows the retry button and what user-facing message is shown for each terminal state.",
+          "disposition": "accepted",
+          "reason": "New finding. Verified against design.md line 3: the retry-button rule is tied to timeout exhaustion, and the auth-failure display is unspecified. C3 covers unlisted error classes, not display of a listed class. The gap is localized and does not change the retry or auth logic, so it is minor and non-blocking."
+        }
+      ]
+    }
+  },
+  "findings": [
+    {
+      "id": "C1",
+      "location": "specs/export/spec.md: ADDED Requirements and Scenario 'Request succeeds'; tasks.md: 1.1",
+      "scenario": "tasks.md 1.1 requires verifying authenticated success, retries, terminal failure, and user retry, and design.md line 3 defines auth-failure, expiry, and access-restriction behavior. The spec has one requirement and one success scenario (spec.md lines 8-13).",
+      "impact": "Retry, terminal-failure, auth-failure, expiry, and access-restriction behavior have no normative requirement or testable scenario, so acceptance cannot be checked against the spec.",
+      "severity": "major",
+      "resolution": "spec.md contains a requirement and at least one WHEN/THEN scenario each for bounded retry, terminal failure with retry button, authentication failure, user retry creating a new request, one-hour link expiry with file deletion, and requesting-customer-only access.",
+      "disposition": "accepted",
+      "reason": "Verified: spec.md lines 8-13 contain only the success path, while design.md line 3 and tasks.md line 4 require the other behaviors. This canonical finding also absorbs A4, which has the same evidence and resolution."
+    },
+    {
+      "id": "C2",
+      "location": "design.md line 3: 'Retry timeouts twice with one second between attempts'",
+      "scenario": "An implementer cannot tell whether 'twice' means two total attempts or one initial attempt plus two retries. The per-attempt timeout duration is not stated anywhere in the packet.",
+      "impact": "Implementations will make different numbers of calls and wait different durations before failing, so retry tests cannot assert one correct attempt count or timing.",
+      "severity": "major",
+      "resolution": "design.md states the total attempt count, the per-attempt timeout duration, and the delay schedule.",
+      "disposition": "accepted",
+      "reason": "Verified: design.md line 3 says 'twice' with no attempt-count or timeout definition, and no other packet file defines them. This is a consequential missing decision."
+    },
+    {
+      "id": "C3",
+      "location": "design.md line 3: 'Retry timeouts twice' and 'Authentication failures are terminal'",
+      "scenario": "A failure that is neither a timeout nor an authentication failure, such as a 5xx response, a network reset, or a malformed response, occurs. design.md line 3 does not say whether it is retried or terminal.",
+      "impact": "Implementers will classify errors differently, so retry behavior and terminal-failure display will vary.",
+      "severity": "major",
+      "resolution": "design.md lists every error class that is retried, every class that is terminal, and the handling for any unlisted class.",
+      "disposition": "accepted",
+      "reason": "Verified: design.md line 3 names only timeouts (retried) and authentication failures (terminal). Unlisted classes are unaddressed, which is a consequential missing failure path. It is distinct from J1, which concerns the display of the auth-failure state."
+    },
+    {
+      "id": "C4",
+      "location": "design.md line 3 ('Retry timeouts twice' with 'User retry creates a new logical request'); contract.md line 2",
+      "scenario": "A timeout occurs after the first attempt has already created an export on the server. Because no request ID is sent, the automatic retry cannot be tied to the original request.",
+      "impact": "Duplicate server-side exports can result from one user action. The design does not state whether duplicates are acceptable or whether the user sees one link or several.",
+      "severity": "major",
+      "resolution": "design.md states the duplicate-export policy for automatic retries and whether the user sees one link or several.",
+      "disposition": "duplicate",
+      "duplicateOf": "A2",
+      "reason": "Same root cause as A2: design.md line 3 omits the request ID, and contract.md line 2 requires one per logical request reused on timeout retries to avoid duplicate writes. A2 is canonical because it is grounded in the repository contract. Residual: A2's resolution should also state whether the user sees one link or several, which C4 raised."
+    },
+    {
+      "id": "C5",
+      "location": "specs/export/spec.md line 9 ('JSON export of the authenticated customer profile') versus design.md line 3 ('JSON fields are customer ID and display name')",
+      "scenario": "The spec describes the full authenticated customer profile, while the design lists two fields. An implementer cannot tell whether the export must contain every profile field or only these two.",
+      "impact": "The export payload may over-include personal data or omit fields that acceptance tests expect.",
+      "severity": "major",
+      "resolution": "spec.md or design.md enumerates the exact JSON fields included in the export, and the spec and design agree on that list.",
+      "disposition": "accepted",
+      "reason": "Verified: spec.md line 9 and design.md line 3 disagree on the scope of the payload. The payload is the primary deliverable and carries personal-data exposure risk, so major is kept. A5 reports the same conflict at minor severity; C5 is canonical."
+    },
+    {
+      "id": "C6",
+      "location": "design.md line 3: 'links expire after one hour and files are deleted then'",
+      "scenario": "A customer opens a link after one hour. The packet does not define the response for an expired link, or whether deletion happens exactly at expiry or in a later cleanup job.",
+      "impact": "Expiry behavior cannot be tested precisely, and the client does not know whether to offer a new export.",
+      "severity": "minor",
+      "resolution": "design.md or spec.md defines the response for expired links and whether deletion occurs at exactly one hour or within a stated grace period.",
+      "disposition": "accepted",
+      "reason": "Verified: design.md line 3 gives the one-hour expiry and deletion timing but not the expired-link response. This is a localized gap that does not change the core design, so it is minor and non-blocking."
+    },
+    {
+      "id": "C7",
+      "location": "design.md line 3 ('GET /exports/create') versus proposal.md line 14 ('Use existing export API') and spec.md line 9",
+      "scenario": "The design specifies a GET request that creates a resource. The reviewer states the packet does not confirm the existing API's endpoint or method.",
+      "impact": "If the existing API uses a different method or path, the implementer must choose between the design and the existing API.",
+      "severity": "minor",
+      "resolution": "design.md confirms that GET /exports/create is the existing export API endpoint and method, or it names the correct endpoint and method.",
+      "disposition": "duplicate",
+      "duplicateOf": "A1",
+      "reason": "A1 is canonical. contract.md line 2 is repository evidence that POST /exports creates exports and GET /exports/create is unsupported, which resolves C7's open question and raises its severity through A1. C7's minor severity is not retained."
+    },
+    {
+      "id": "A1",
+      "location": "design.md line 3: 'Use GET /exports/create with no request ID'; /tmp/goldfish-e2e-claude/contract.md line 2",
+      "scenario": "Implementation follows design.md and issues GET /exports/create. contract.md line 2 states that GET /exports/create is unsupported and that POST /exports creates an export.",
+      "impact": "Every export request fails against the existing API, so the core capability cannot work. The planning premise conflicts with the documented contract.",
+      "severity": "critical",
+      "resolution": "design.md names the method and path that contract.md documents as supported (POST /exports), or the packet cites an authoritative source showing the contract has changed and contract.md is updated. The spec and tasks reference the same endpoint.",
+      "disposition": "accepted",
+      "reason": "Verified: design.md line 3 specifies GET /exports/create, and contract.md line 2 says GET /exports/create is unsupported. This is an infeasible premise, so critical is supported. C7 is folded into this finding."
+    },
+    {
+      "id": "A2",
+      "location": "design.md line 3 ('no request ID' and 'Retry timeouts twice'); /tmp/goldfish-e2e-claude/contract.md line 2",
+      "scenario": "A timeout occurs and the design retries. Because design.md sends no request ID, each attempt is a new logical request. contract.md line 2 requires a unique request ID per logical request, reused on timeout retries.",
+      "impact": "Timeout retries can create duplicate writes, which the contract is designed to prevent. The retry policy is unsafe under the documented contract.",
+      "severity": "major",
+      "resolution": "design.md specifies that a request ID is generated once per logical request, reused across timeout retries, and regenerated only for user retry. The spec or design states this, and tasks.md 1.1 verifies that retries reuse the same ID.",
+      "disposition": "accepted",
+      "reason": "Verified: contract.md line 2 requires request-ID reuse on timeout retries and a new ID for user retry, and design.md line 3 specifies neither. This is a consequential contract violation in the failure path. It is canonical for C4."
+    },
+    {
+      "id": "A3",
+      "location": "design.md line 3 ('Synchronous response returns the link on success'); specs/export/spec.md lines 11-13",
+      "scenario": "The reviewer says the response model is unclear, because the contract does not document a response shape and the spec's success scenario states no sync or async behavior.",
+      "impact": "Claimed: implementers may assume an asynchronous job model and poll, or may not handle an in-progress state.",
+      "severity": "minor",
+      "resolution": "The spec states the response model (synchronous or not) and the success and timeout response shape, cross-referenced to the existing export API contract.",
+      "disposition": "dismissed",
+      "reason": "Already covered in part: design.md line 3 states that the response is synchronous and returns the link on success, so the sync model is decided. The remaining gap, the response shape on timeout, is already captured by C2 and C3 (timeout and failure-path definition). contract.md line 2 documents no response shape, so the cross-reference cannot be satisfied by the repository alone, but that is not a separate blocking defect."
+    },
+    {
+      "id": "A4",
+      "location": "specs/export/spec.md lines 8-13; tasks.md line 4",
+      "scenario": "tasks.md 1.1 requires verifying retries, terminal failure, and user retry, and design.md line 3 defines auth failure, retry affordance, expiry, and access control. The spec has only a success scenario.",
+      "impact": "The verified and designed behaviors have no normative requirement or scenario, so they can be implemented or tested inconsistently.",
+      "severity": "major",
+      "resolution": "specs/export/spec.md contains requirements and scenarios for timeout retry count and interval; terminal failure and retry affordance; user retry as a new logical request; authentication failure as terminal; link expiry of one hour with file deletion; and access restricted to the requesting customer.",
+      "disposition": "duplicate",
+      "duplicateOf": "C1",
+      "reason": "Same evidence and same resolution as C1 (spec.md lines 8-13 versus tasks.md line 4 and design.md line 3). C1 is canonical. A4 adds no unique requirement beyond C1's resolution."
+    },
+    {
+      "id": "A5",
+      "location": "design.md line 3 ('JSON fields are customer ID and display name'); specs/export/spec.md line 9 ('customer profile')",
+      "scenario": "design.md limits the JSON export to customer ID and display name, while the spec says the export contains the authenticated customer profile without enumerating fields.",
+      "impact": "The spec permits exporting the full profile, which could include fields beyond ID and display name, with privacy consequences.",
+      "severity": "minor",
+      "resolution": "specs/export/spec.md lists the exact exported fields consistently with design.md, or design.md and the spec both reference the same field definition.",
+      "disposition": "duplicate",
+      "duplicateOf": "C5",
+      "reason": "Same conflict as C5 (spec.md line 9 versus design.md line 3). C5 is canonical and carries the major severity because the payload scope affects personal data. A5's minor severity is not retained."
+    },
+    {
+      "id": "J1",
+      "location": "design.md line 3 ('show a terminal failure and a retry button' and 'Authentication failures are terminal')",
+      "scenario": "Design line 3 says the retry button appears after timeout exhaustion, and separately that authentication failures are terminal. It does not say whether the authentication-failure state shows the retry button or what error message text is displayed.",
+      "impact": "Two implementers could render the auth-failure state differently, with or without a retry button and with different messages. The effect is localized to UI state.",
+      "severity": "minor",
+      "resolution": "design.md states whether the authentication-failure terminal state shows the retry button and what user-facing message is shown for each terminal state.",
+      "disposition": "accepted",
+      "reason": "New finding. Verified against design.md line 3: the retry-button rule is tied to timeout exhaustion, and the auth-failure display is unspecified. C3 covers unlisted error classes, not display of a listed class. The gap is localized and does not change the retry or auth logic, so it is minor and non-blocking."
+    }
+  ],
+  "revisionOffer": "Offer specific artifact revisions and wait for explicit acceptance."
+}

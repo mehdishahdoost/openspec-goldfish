@@ -1,0 +1,82 @@
+{
+  "date": "2026-11-08",
+  "scenario": "Manual review, immutable persisted report, separate explicit subset approval, planning-only revision and stale verdict",
+  "harnesses": {
+    "claude": {
+      "version": "2.1.319",
+      "runId": "2a83a8be-c88b-424a-9238-ddb736b0c7e8",
+      "completion": "complete",
+      "readiness": "revise",
+      "freshnessAfterRevision": "stale",
+      "reviewInputsUnchangedBeforeApproval": true,
+      "changedPlanningFiles": [
+        "design.md"
+      ],
+      "acceptedIds": [
+        "A1",
+        "A2"
+      ],
+      "originalReportFilesUnchanged": true,
+      "automaticReviewStarted": false,
+      "runCountBeforeAndAfterRevision": 2,
+      "originalFileHashes": {
+        "report.md": "99d2c3f854c84b5cee05c7bdcbb2484fb7c6c6ccd23d8b72fc128c48a0954fe3",
+        "report.json": "15d7021135180fab13065ab16bc35dc88e9d37a0097419511cf4589bbc262f11",
+        "results.json": "e08fa66be659f050db6fa7f6a4ffa2011312ba2dbcd132c5a4c1ef7826ec214c",
+        "cold-packet.json": "fc6e8e96ede1ec49c6dcdbb7577734f5b7ac2f13c59f8ce7e03b78a856c92227",
+        "inputs.json": "94bd1ede6e68a9362e378b47232caf1ff3a6838f8dc87e5ddf9bafd858dd658c"
+      }
+    },
+    "codex": {
+      "version": "0.167.0",
+      "runId": "602fda52-1a58-43b8-872c-66fcfdb46bca",
+      "completion": "complete",
+      "readiness": "revise",
+      "freshnessAfterRevision": "stale",
+      "reviewInputsUnchangedBeforeApproval": true,
+      "changedPlanningFiles": [
+        "design.md"
+      ],
+      "acceptedIds": [
+        "A1",
+        "A2"
+      ],
+      "originalReportFilesUnchanged": true,
+      "automaticReviewStarted": false,
+      "runCountBeforeAndAfterRevision": 2,
+      "originalFileHashes": {
+        "revision-offer.json": "889b3f94cbf781b4b49738f350a2b7c0ff9d78c7f977211b94e5a8f77d1a2432",
+        "report.md": "22d4b75df7fe97580f30bfed6d84ccbedb6bd4f6fd64ae74622d7b63deb668a1",
+        "report.json": "f19227092af6e18a9a31b1988482d4787d3d4d25bdf3cdf499dc79a424ca66b0",
+        "results.json": "de02365b92708ba298767ff5b1642687bc66be3aaf6ebb5cddfa838e0ee49f34",
+        "cold-packet.json": "fc6e8e96ede1ec49c6dcdbb7577734f5b7ac2f13c59f8ce7e03b78a856c92227",
+        "inputs.json": "079c0f66eda2d80d7a1e5d534c057b5f8ca4ad16e56f4ccabf1dd01b77b38152"
+      }
+    },
+    "devin": {
+      "version": "3000.12.28",
+      "runId": "c6e51339-6320-458b-916b-f0833e347111",
+      "completion": "complete",
+      "readiness": "revise",
+      "freshnessAfterRevision": "stale",
+      "reviewInputsUnchangedBeforeApproval": true,
+      "changedPlanningFiles": [
+        "design.md"
+      ],
+      "acceptedIds": [
+        "A1",
+        "A2"
+      ],
+      "originalReportFilesUnchanged": true,
+      "automaticReviewStarted": false,
+      "runCountBeforeAndAfterRevision": 2,
+      "originalFileHashes": {
+        "report.md": "93d19d785a712c8a9e7b0d7976e9a17f0765532e4b10108fbd9bce748bb2aabc",
+        "report.json": "9930093161f73af775937b05c4037a2d8cda474217182fcc7ad5f48670d624bf",
+        "results.json": "13d2473e38235aa5dd0ed7440b67daa773fa4a9160d6ec1450f98c012b91d585",
+        "cold-packet.json": "90e2a2f1ba5ceb9c5d0cf12e9b5433d68a431cad3c23e350bb7917f7165c361a",
+        "inputs.json": "15f4e1513f7c176a8eacbea465c90ef41b7b005b71ba69f05b11ee99f9d1dce5"
+      }
+    }
+  }
+}

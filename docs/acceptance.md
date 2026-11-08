@@ -14,7 +14,7 @@ The packaging test builds a local tarball, installs it into a temporary npm pref
 
 Devin imports Claude skills; the qualified command selects the intended native provider. Test installations used temporary project/config roots, preserving actual user installations.
 
-## Pending native acceptance procedure
+## Native acceptance procedure (completed below)
 
 Use an authenticated writable environment for each harness. Install into a temporary OpenSpec project and complete a sample planning package without implementing it. Invoke the native Goldfish command explicitly.
 
@@ -80,3 +80,13 @@ A subsequent retry identified a test-configuration mismatch: using `--setting-so
 Claude Code 2.1.319 completed all four named native role instances with normal user authentication settings enabled and plan permissions. The cold reader identified missing retry rules without the hidden author count, the grounded reviewer cited both planning and API contract, and adjudication retained C1–C4 and A1–A3 with reasoned dispositions. The clean reviewer returned one minor request-ID reuse finding; this run does not demonstrate an empty finding set. No permission denials occurred and fixture hashes were unchanged. Actual role outputs are retained in [Claude evidence](native/claude-2.1.319.json).
 
 No Claude adapter change or user reauthentication was required. The prior authentication failure was caused by the probe excluding user settings containing working authentication configuration. Task 6.2 remains open because full native report persistence and accepted revisions across all harnesses have not been exercised.
+
+## Full native review and revision workflow verified
+
+The remaining task 6.2 passed in separate temporary OpenSpec projects for Claude Code 2.1.319, Codex CLI 0.167.0, and Devin CLI 3000.12.28. Each harness resolved a complete unimplemented change, ran independent native reviewers and adjudication, saved validated current JSON/Markdown reports, offered revisions, and stopped without planning edits. A separate resumed user turn explicitly accepted only A1 and A2 and only design.md edits. All three then prepared the revision, applied the API-contract corrections, saved applied/deferred outcomes, preserved original report-file hashes, and reported stale input fingerprints without starting another review. Main specs, proposal, tasks, configuration and implementation remained unchanged.
+
+[Evidence summary](native/end-to-end/summary.json) records versions, run IDs and verified file hashes. Each harness subdirectory contains its original report JSON/Markdown, the explicit approval message, revision record and resulting design. Replay tests validate the actual native records against the current deterministic contract.
+
+An initial Codex run returned an invalid reconstruction object. It correctly persisted an incomplete/undetermined report rather than bypassing validation; an explicitly requested new run passed after clarifying that reconstruction must be a nonempty string. Initial Claude/Devin probes guessed outdated harness versions; corrected explicit invocations supplied versions measured by the driver and retained prior reports. Workflow instructions now require measured version information rather than guesses from documentation.
+
+Automated validation: 38 tests pass, including three native-record replay checks; strict OpenSpec change validation passes. These are fixture-based acceptance observations, not a guarantee of consistent model judgments on every proposal. No package was published.
