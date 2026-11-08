@@ -33,10 +33,14 @@ Omit selections to choose interactively. The scope prompt defaults to the curren
 Complete your OpenSpec proposal, then invoke in your harness:
 
 ```text
-Claude Code: /openspec-goldfish <change-name>
-Codex:       $openspec-goldfish <change-name>
-Devin CLI:   /openspec-goldfish <change-name>
+Claude Code: /openspec-goldfish [change-name]
+Codex:       $openspec-goldfish [change-name]
+Devin CLI:   /openspec-goldfish [change-name]
 ```
+
+The change name is optional. Run `/openspec-goldfish` (or `$openspec-goldfish` in Codex) to select the sole active change automatically. If multiple changes are active, Goldfish asks which one to review. Provide a change name to select it directly; omit the square brackets shown above.
+
+These are harness skill invocations. The shell command `openspec-goldfish` runs the installer.
 
 ```text
 proposal --> manual Goldfish review --> report
