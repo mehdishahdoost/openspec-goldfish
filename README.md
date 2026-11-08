@@ -2,6 +2,8 @@
 
 # OpenSpec Goldfish
 
+[![npm version](https://img.shields.io/npm/v/openspec-goldfish.svg)](https://www.npmjs.com/package/openspec-goldfish)
+
 Independent eyes on your proposal, before implementation.
 
 Goldfish gives your OpenSpec planning package a fresh-context cold read, a grounded adversarial review, and evidence-based adjudication. You invoke it manually, read the report, and choose whether to revise.
@@ -22,7 +24,9 @@ A misunderstanding is a candidate finding, not proof of a defect. The adjudicato
 
 ## Install
 
-Requires Node.js 22+ and a supported coding harness. Review also requires OpenSpec with resolved artifact metadata. Install the MIT-licensed package from npm:
+Requires Node.js 22+ and a supported coding harness. Review also requires OpenSpec with resolved artifact metadata.
+
+Goldfish is available on npm under the MIT license. Install it with:
 
 ```bash
 npx openspec-goldfish
