@@ -79,7 +79,7 @@ export async function snapshot(target,constraints='') {
  return {files,metadata,fingerprint:digest(JSON.stringify({files:files.map(({content,...f})=>f),metadata}))};
 }
 export function coldPacket(inputs){return {constraints:inputs.metadata.constraints,artifacts:inputs.files.map(({artifact,path,content})=>({artifact,path,content}))};}
-export async function createRun(target,inputs,{harness,harnessVersion,packageVersion='0.1.0'}={}) {
+export async function createRun(target,inputs,{harness,harnessVersion,packageVersion='0.1.1'}={}) {
  if(!['claude','codex','devin'].includes(harness)||!harnessVersion)throw new Error('Harness and actual harness version required');
  const id=randomUUID();const dir=await contained(target.status.changeRoot,path.join(target.status.changeRoot,'.goldfish/reviews',id));
  await mkdir(dir,{recursive:true});
