@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtemp,writeFile,readFile,mkdir,symlink} from 'node:fs/promises';
+import {mkdtemp,writeFile,readFile,mkdir,symlink,readdir} from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import {discover,validatePlanning,snapshot,coldPacket,createRun,adjudicate,finalize,revisionOffer,prepareRevision,recordRevision} from '../src/review/core.js';
@@ -87,4 +87,56 @@ test('review paths allow root ancestor aliases while rejecting symlinks inside t
  const outside=await fixture();await symlink(outside.root,path.join(change,'linked'),'junction');
  t.status.artifactPaths.plan.existingOutputPaths=[path.join(change,'linked','plan.md')];
  await assert.rejects(snapshot(t),/Symlink/);
+});
+
+test('incomplete candidates do not seal a run and completed results can follow',async()=>{
+ const t=await fixture(), inputs=await snapshot(t);
+ const mutations=[
+  [r=>delete r.adjudicator,/Missing adjudicator/],
+  [r=>r.adjudicator.coverage=null,/Malformed adjudicator/],
+  [r=>Object.assign(r['cold-reader'],{status:'failed',error:'timeout'}),/timeout/],
+  [r=>r.adjudicator.findings=[],/omitted C1/],
+  [r=>r['adversarial-reviewer'].findings=[finding()],/IDs collide/],
+  [r=>Object.assign(r.adjudicator.findings[0],{disposition:'duplicate',duplicateOf:'missing'}),/Invalid duplicate/]
+ ];
+ for(const [mutate,diagnostic] of mutations){
+  const run=await createRun(t,inputs,{harness:'devin',harnessVersion:'test'});
+  const original=await Promise.all(['inputs.json','cold-packet.json'].map(f=>readFile(path.join(run.dir,f),'utf8')));
+  const candidate=results([finding()]);mutate(candidate);
+  await assert.rejects(finalize(run.dir,candidate,inputs),e=>diagnostic.test(e.message)&&/Await pending roles/.test(e.message));
+  assert.deepEqual((await readdir(run.dir)).sort(),['cold-packet.json','inputs.json']);
+  assert.deepEqual(await Promise.all(['inputs.json','cold-packet.json'].map(f=>readFile(path.join(run.dir,f),'utf8'))),original);
+  assert.equal((await finalize(run.dir,results([finding()]),inputs)).completion,'complete');
+ }
+});
+
+test('intentional incomplete reporting requires a reason and preserves immutable evidence',async()=>{
+ const t=await fixture(),inputs=await snapshot(t);
+ const run=await createRun(t,inputs,{harness:'devin',harnessVersion:'test'});
+ const partial=results([finding()]);
+ partial.adjudicator={role:'adjudicator',status:'failed',error:'timeout',coverage:[],evidence:[],findings:[]};
+ for(const incompleteReason of ['', '  ', null, 42, {}, []]){
+  await assert.rejects(finalize(run.dir,partial,inputs,{incompleteReason}),/nonempty string/);
+  assert.deepEqual((await readdir(run.dir)).sort(),['cold-packet.json','inputs.json']);
+ }
+ await assert.rejects(finalize(run.dir,results(),inputs,{incompleteReason:'failure'}),/normal finalization/);
+ assert.deepEqual((await readdir(run.dir)).sort(),['cold-packet.json','inputs.json']);
+ const report=await finalize(run.dir,partial,inputs,{incompleteReason:'  Adjudicator timed out  '});
+ assert.equal(report.completion,'incomplete');assert.equal(report.readiness,'undetermined');
+ assert.equal(report.incompleteReason,'Adjudicator timed out');assert.match(report.coverageLimits.join(),/timeout/);
+ assert.deepEqual(JSON.parse(await readFile(path.join(run.dir,'results.json'))),partial);
+ assert.equal(JSON.parse(await readFile(path.join(run.dir,'report.json'))).incompleteReason,report.incompleteReason);
+ assert.match(await readFile(path.join(run.dir,'report.md'),'utf8'),/Incomplete reason: Adjudicator timed out/);
+ const names=await readdir(run.dir),before=await Promise.all(names.map(f=>readFile(path.join(run.dir,f),'utf8')));
+ await assert.rejects(finalize(run.dir,results(),inputs),/EEXIST/);
+ assert.deepEqual(await Promise.all(names.map(f=>readFile(path.join(run.dir,f),'utf8'))),before);
+});
+test('complete ready and revise reports remain compatible without failure options',async()=>{
+ const t=await fixture(),inputs=await snapshot(t);
+ for(const findings of [[],[finding()]]){
+  const run=await createRun(t,inputs,{harness:'codex',harnessVersion:'test'});
+  const report=await finalize(run.dir,results(findings),inputs);
+  assert.equal(report.completion,'complete');assert.equal(report.readiness,findings.length?'revise':'ready');
+  assert.equal(report.freshness,'current');assert.ok(!('incompleteReason' in report));
+ }
 });

@@ -109,7 +109,7 @@ export function validateResult(result,role) {
 export function adjudicate(results,{stale=false}={}) {
  const coverage=[];const valid={};
  for(const role of roles){
-  try{valid[role]=validateResult(results[role],role);if(valid[role].status==='failed')coverage.push(`${role}: ${valid[role].error}`);}
+  try{if(results?.[role]===undefined)throw new Error(`Missing ${role} result`);valid[role]=validateResult(results[role],role);if(valid[role].status==='failed')coverage.push(`${role}: ${valid[role].error}`);}
   catch(e){coverage.push(e.message);}
  }
  const findings=valid.adjudicator?.findings||[];
@@ -124,6 +124,7 @@ export function adjudicate(results,{stale=false}={}) {
 }
 export function markdown(report){
  const lines=[`# Goldfish review: ${report.change}`,``, `Completion: **${report.completion}**`, `Readiness: **${report.readiness}**`, `Freshness: **${report.freshness}**`, '',report.freshness==='stale'?'This verdict describes older inputs and is not current.':'Readiness is advisory, not an implementation gate.','', '## Coverage',''];
+ if(report.incompleteReason)lines.push(`Incomplete reason: ${report.incompleteReason}`,'');
  for(const [role,result] of Object.entries(report.roleResults))lines.push(`- ${role}: ${result.status}; ${result.coverage.join('; ')}`);
  for(const limit of report.coverageLimits)lines.push(`- LIMIT: ${limit}`);
  lines.push('','## Findings','');
@@ -132,10 +133,15 @@ export function markdown(report){
  lines.push('','## Next step','',report.revisionOffer,'Re-review requires a new explicit invocation.');
  return lines.join('\n')+'\n';
 }
-export async function finalize(dir,results,currentInputs) {
+export async function finalize(dir,results,currentInputs,{incompleteReason}={}) {
  const inputs=JSON.parse(await readFile(path.join(dir,'inputs.json'),'utf8'));
  await contained(inputs.changeRoot,dir);
  const report={runId:inputs.runId,change:inputs.change,harness:inputs.harness,harnessVersion:inputs.harnessVersion,packageVersion:inputs.packageVersion,protocolVersion:inputs.protocolVersion,inputFingerprint:inputs.fingerprint,createdAt:new Date().toISOString(),...adjudicate(results,{stale:inputs.fingerprint!==currentInputs.fingerprint})};
+ if(incompleteReason!==undefined){
+  if(!nonempty(incompleteReason))throw new Error('incompleteReason must be a nonempty string');
+  if(report.completion==='complete')throw new Error('Complete results require normal finalization; omit --incomplete-reason.');
+  report.incompleteReason=incompleteReason.trim();
+ }else if(report.completion==='incomplete')throw new Error(`Finalization rejected: ${report.coverageLimits.join('; ')}. Await pending roles and supply completed results to this same unsealed run. For terminal failure only, use --incomplete-reason "<reason>" to record an incomplete report.`);
  // Reserve once: never rewrite an earlier report, even after partial failure.
  await writeFile(path.join(dir,'results.json'),JSON.stringify(results,null,2)+'\n',{flag:'wx'});
  await writeFile(path.join(dir,'report.json'),JSON.stringify(report,null,2)+'\n',{flag:'wx'});

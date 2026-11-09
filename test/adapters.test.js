@@ -20,6 +20,13 @@ for(const harness of ['claude','codex','devin'])for(const scope of ['local','glo
  assert.doesNotMatch(body,/sandbox_mode|approval_policy/);
  }
  }
+ for(const resource of ['protocol/workflow.md','protocol/result-contract.md','runtime/core.js','runtime/tool.js']){
+  const installed=await readFile(path.join(plan.root,plan.skill,resource),'utf8');
+  const source=resource.startsWith('protocol/')?new URL('../resources/'+resource,import.meta.url):new URL('../src/review/'+path.basename(resource),import.meta.url);
+  assert.equal(installed,await readFile(source,'utf8'));
+ }
+ assert.match(await readFile(path.join(plan.root,plan.skill,'protocol/workflow.md'),'utf8'),/Do not finalize while any expected role is pending/);
+ assert.match(await readFile(path.join(plan.root,plan.skill,'runtime/tool.js'),'utf8'),/incomplete-reason/);
  assert.ok(!Object.keys(plan.files).some(p=>p.includes('hooks')||p.includes('openspec-propose')));
  if(harness==='claude')assert.match(plan.files[`${plan.skill}/SKILL.md`],/disable-model-invocation: true/);
  if(harness==='codex')assert.match(plan.files[`${plan.skill}/agents/openai.yaml`],/allow_implicit_invocation: false/);
