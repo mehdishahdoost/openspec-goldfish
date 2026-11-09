@@ -17,7 +17,7 @@ try {
   const inputs=await json(path.join(opts.run,'inputs.json'));
   const target=discover({change:inputs.change,store:inputs.store,cwd:inputs.cwd});
   const current=await snapshot(target,inputs.metadata.constraints);
-  if(action==='finalize')result=await finalize(opts.run,await json(opts.results),current);
+  if(action==='finalize')result=await finalize(opts.run,await json(opts.results),current,{incompleteReason:opts['incomplete-reason']});
   if(action==='freshness')result={freshness:inputs.fingerprint===current.fingerprint?'current':'stale'};
   if(action==='prepare-revision'){const offer=await json(opts.offer); revisionOffer(await json(path.join(opts.run,'report.json')),offer.edits); result=await prepareRevision(inputs,offer,await json(opts.acceptance));}
   if(action==='record-revision')result=await recordRevision(opts.run,await json(opts.outcomes),current);
