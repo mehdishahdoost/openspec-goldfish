@@ -8,7 +8,7 @@ import os from 'node:os';
 
 // Exercise the actual CLI in a child process, providing only deterministic
 // OpenSpec discovery metadata. Finalization, snapshots, and IO are not mocked.
-export async function exerciseFinalization(runtime){
+export async function exerciseFinalization(runtime,{packageVersion}={}){
  const cwd=await mkdtemp(path.join(os.tmpdir(),'goldfish-finalize-cli-'));
  const changeRoot=path.join(cwd,'change');await mkdir(changeRoot);
  const plan=path.join(changeRoot,'plan.md');await writeFile(plan,'Export profile');
@@ -34,6 +34,7 @@ cp.spawnSync=(cmd,args,opts)=>{
  const results={'cold-reader':role('cold-reader'),'adversarial-reviewer':role('adversarial-reviewer')};
  const file=path.join(cwd,'candidate.json');await writeFile(file,JSON.stringify(results));
  const dir=start();
+ if(packageVersion)assert.equal(JSON.parse(await readFile(path.join(dir,'inputs.json'))).packageVersion,packageVersion);
  const finalize=(run,...extra)=>invoke(['finalize','--run',run,'--results',file,...extra]);
  let r=finalize(dir);assert.equal(r.status,1);assert.match(r.stderr,/Missing adjudicator/);assert.match(r.stderr,/Await pending roles/);
  assert.deepEqual((await readdir(dir)).sort(),['cold-packet.json','inputs.json']);

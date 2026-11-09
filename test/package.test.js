@@ -33,7 +33,7 @@ test('packed package installs all adapters and bundled runtime works away from p
   const result=run(process.execPath,[runtime],{cwd:temp,encoding:'utf8'});
   assert.match(result.stderr,/Commands: start/);assert.doesNotMatch(result.stderr,/MODULE_NOT_FOUND|SyntaxError/);
   assert.ok(await readFile(path.join(loc.root,loc.skill,'protocol/workflow.md')));
-  await exerciseFinalization(runtime);
+  await exerciseFinalization(runtime,{packageVersion:metadata.version});
  }
  const result=run(process.execPath,[path.join(pkg,'bin/openspec-goldfish.js'),'--help'],{cwd:temp,encoding:'utf8'});assert.equal(result.status,0);assert.match(result.stdout,/Usage/);
 });
