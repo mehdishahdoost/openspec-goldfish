@@ -8,6 +8,12 @@ Independent eyes on your proposal, before implementation.
 
 Goldfish gives your OpenSpec planning package a fresh-context cold read, a grounded adversarial review, and evidence-based adjudication. You invoke it manually, read the report, and choose whether to revise.
 
+## Watch the video
+
+[![Watch OpenSpec Goldfish on YouTube](https://img.youtube.com/vi/sUQUOpKxbm8/hqdefault.jpg)](https://www.youtube.com/watch?v=sUQUOpKxbm8)
+
+[Watch on YouTube](https://www.youtube.com/watch?v=sUQUOpKxbm8)
+
 ## Why independent reviews?
 
 A proposal can look complete to its author because the conversation around it fills the gaps. An implementer may only receive the artifacts. Goldfish checks whether those artifacts stand on their own, then challenges them against the repository before implementation begins.
@@ -132,6 +138,6 @@ Inspired by the independent critique approach in [openspec-adversarial-multi-age
 
 ## Project and license
 
-[Website](https://shahdoost.nl/openspec-goldfish/) · [npm](https://www.npmjs.com/package/openspec-goldfish) · [Release guide](docs/releasing.md)
+[Website](https://writebyhumans.com/openspec-goldfish/) · [npm](https://www.npmjs.com/package/openspec-goldfish) · [Release guide](docs/releasing.md)
 
 Released under the [MIT License](LICENSE).
